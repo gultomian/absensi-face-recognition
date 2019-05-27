@@ -11,6 +11,7 @@ import datetime     #untuk waktu
 from datetime import date
 import time
 import glob
+import os.path
 
 window = Tk()
 #window.geometry("500x400")
@@ -288,10 +289,21 @@ def ambilgambar():
         cv2.destroyAllWindows() 
         res = "Data dengan NPM: " + NPM +" dan Nama: "+ Nama +" disimpan"
         row = [NPM, Nama]
-        with open('Mahasiswa\DescMahasiswa.csv','a+') as csvFile:
-            writer = csv.writer(csvFile)
-            writer.writerow(row)
-        csvFile.close()
+        
+        if not os.path.isfile('Mahasiswa\DescMahasiswa.csv'):
+            with open('Mahasiswa\DescMahasiswa.csv', mode='w', newline='') as file_output:
+                file_csv = csv.writer(file_output)
+                file_csv.writerow(['NPM', 'Nama'])
+                file_output.close()
+            with open('Mahasiswa\DescMahasiswa.csv',mode='a+', newline='') as csvFile:
+                writer = csv.writer(csvFile)
+                writer.writerow(row)
+            csvFile.close()
+        else:
+            with open('Mahasiswa\DescMahasiswa.csv',mode='a+', newline='') as csvFile:
+                writer = csv.writer(csvFile)
+                writer.writerow(row)
+            csvFile.close()
         #message1.configure(text= res,fg='green')
         infogambar = mb.showinfo("Data Disimpan",res)
     else:
@@ -304,6 +316,10 @@ def ambilgambar():
         if(len(NPM) <=0 or len(Nama)<=0):
             res = "Kedua form harus dilengkapi"
             message1.configure(text= res,fg='red')
+    
+    
+
+
 
 def getgambardanlabel(path):
     #ambil path dari file di folder
