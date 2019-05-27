@@ -304,10 +304,6 @@ def ambilgambar():
         if(len(NPM) <=0 or len(Nama)<=0):
             res = "Kedua form harus dilengkapi"
             message1.configure(text= res,fg='red')
-    
-    
-
-
 
 def getgambardanlabel(path):
     #ambil path dari file di folder
