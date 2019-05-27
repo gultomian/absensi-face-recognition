@@ -13,16 +13,25 @@ import time
 import glob
 
 window = Tk()
-window.geometry("500x400")
-window.iconbitmap("D:\python\cobacoba\ikon.ico")
+#window.geometry("500x400")
+window.iconbitmap("ikon.ico")
 window.title("Absensi Facial Recognition")
 window.configure(background='#f3f3f3')
+#window.resizable(0,0)
+
+width = 500
+height = 400
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+x = (screen_width/2) - (width/2)
+y = (screen_height/2) - (height/2)
+window.geometry("%dx%d+%d+%d" % (width, height, x, y))
 window.resizable(0,0)
 
-logo = Image.open("D:\python\cobacoba\logo.jpg")
+logo = Image.open("logo.jpg")
 renderlogo = ImageTk.PhotoImage(logo)
 
-# labels can be text or images
+# label dijadiin variabel logo
 img = Label(window, image=renderlogo)
 img.image = renderlogo
 img.place(x=50, y=50)
@@ -67,23 +76,23 @@ def pathabsensi():
 
 def penggunaan():
     penggunaanwin = Toplevel(window)
-    penggunaanwin.iconbitmap("D:\python\cobacoba\ikon.ico")
+    penggunaanwin.iconbitmap("ikon.ico")
     penggunaanwin.title("Penggunaan")
     penggunaanwin.geometry('800x100')
     penggunaanwin.resizable(0,0)
-    text_penggunaan = Text(penggunaanwin,font= ('helvetica',11), height=30,width=300)
+    text_penggunaan = Text(penggunaanwin,font= ('helvetica',11,'bold'), height=30,width=300)
     text_penggunaan.config(state='normal')
-    text_penggunaan.insert(INSERT,"1. Set folder tempat penyimpanan file absensi di dropdown menu 'Set Folder Absensi'.\n")
-    text_penggunaan.insert(INSERT,"2. Mulai mengambil gambar muka dengan memasukan NPM dan Nama dan mengklik tombol Deteksi Wajah.\n")
-    text_penggunaan.insert(INSERT,"3. Setelah gambar wajah diambil, mulai memproses data gambar dengan mengklik Proses Data.\n")
-    text_penggunaan.insert(INSERT,"4. Setelah Proses selesai, mulai pengenalan wajah dengan mengklik Kenali Wajah.\n")
-    text_penggunaan.insert(INSERT,"5. Hasil Pengenalan Wajah  akan di buat menjadi file .csv dan disimpan di folder yang sudah di-set sebelumnya.")
+    text_penggunaan.insert(INSERT,"1.   Set folder tempat penyimpanan file absensi di dropdown menu 'Set Folder Absensi'.\n")
+    text_penggunaan.insert(INSERT,"2.   Mulai mengambil gambar muka dengan memasukan NPM dan Nama dan mengklik tombol Deteksi Wajah.\n")
+    text_penggunaan.insert(INSERT,"3.   Setelah gambar wajah diambil, mulai memproses data gambar dengan mengklik Proses Data.\n")
+    text_penggunaan.insert(INSERT,"4.   Setelah Proses selesai, mulai pengenalan wajah dengan mengklik Kenali Wajah.\n")
+    text_penggunaan.insert(INSERT,"5.   Hasil Pengenalan Wajah  akan di buat menjadi file .csv dan disimpan di folder yang sudah di-set sebelumnya.")
     text_penggunaan.config(state='disabled')
     text_penggunaan.pack()
 
 def viewmhs():
     mhswin = Toplevel(window)
-    mhswin.iconbitmap("D:\python\cobacoba\ikon.ico")
+    mhswin.iconbitmap("ikon.ico")
     mhswin.title("Daftar Mahasiswa")
     
     width = 500
@@ -113,7 +122,7 @@ def viewmhs():
 
     tree.pack()
 
-    with open('D:\python\cobacoba\Mahasiswa\DescMahasiswa.csv') as f:
+    with open('Mahasiswa\DescMahasiswa.csv') as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             NPM = row['NPM']
@@ -122,7 +131,7 @@ def viewmhs():
 
 def viewabs():
     abswin = Toplevel(window)
-    abswin.iconbitmap("D:\python\cobacoba\ikon.ico")
+    abswin.iconbitmap("ikon.ico")
     abswin.title("Daftar Absensi Terbaru")
     
     width = 500
@@ -188,23 +197,32 @@ def viewabs():
 
     tree.pack()
     
-    pathabsensi = uye.get()        
-    daftar_file = glob.glob(pathabsensi+'\*.csv') #menyaring file di path
-    try:    
-        file_terbaru = max(daftar_file, key=os.path.getctime) #ambil file terbaru dari folder
-        
-        tampil_path.configure(text='Menampilkan entry absensi terbaru di '+pathabsensi, fg='green')
-        with open(file_terbaru) as f:
-            reader = csv.DictReader(f, delimiter=',')
-            for row in reader:
-                NPM = row['NPM']
-                Nama = row['Nama']
-                Tanggal = row['Tanggal']
-                Waktu = row['Waktu']
-                tree.insert("", 0, values=(NPM, Nama, Tanggal, Waktu))
-    except(ValueError):
-        tampil_path.configure(text='Tidak Ada File yang Ditampilkan',fg='red')
-        
+    def show_csv():
+        daftar_file = glob.glob(pathabsensi+'\*.csv') #menyaring file di path
+        try:    
+            file_terbaru = max(daftar_file, key=os.path.getctime) #ambil file terbaru dari folder
+            tampil_path.configure(text='Menampilkan entry absensi terbaru di '+pathabsensi, fg='green')
+            with open(file_terbaru) as f:
+                reader = csv.DictReader(f, delimiter=',')
+                for row in reader:
+                    NPM = row['NPM']
+                    Nama = row['Nama']
+                    Tanggal = row['Tanggal']
+                    Waktu = row['Waktu']
+                    tree.insert("", 0, values=(NPM, Nama, Tanggal, Waktu))
+        except(ValueError):
+            tampil_path.configure(text='Tidak Ada File yang Ditampilkan',fg='red')
+
+
+    if not uye.get():
+        pathabsensi='Absensi'
+        show_csv()
+    else:
+        pathabsensi = uye.get()
+        show_csv()
+
+def tentang():
+    mb.showinfo('Absensi Facial Recognition', 'Dibuat oleh Christian Daomara\nSebagai syarat melengkapi Penulisan Ilmiah')
 
 
 dropdown_view.add_command(label='Absensi', command=viewabs)
@@ -214,7 +232,7 @@ dropdown_file.add_separator()
 dropdown_file.add_command(label='Keluar',command=keluar)
 dropdown_help.add_command(label='Penggunaan',command=penggunaan)
 dropdown_help.add_separator()
-dropdown_help.add_command(label='Tentang')
+dropdown_help.add_command(label='Tentang', command=tentang)
 
 
 #-------------End Dropdown Menu-------------
@@ -235,12 +253,13 @@ def angka_numerik(s):
  
     return False
 
-def ambilgambar():      
+def ambilgambar():   
     NPM=(entry1.get())
     Nama=(entry2.get())
     if(angka_numerik(NPM) and (any(x.isalpha() for x in Nama) 
     and any(x.isspace() for x in Nama) 
     or all(x.isalpha() or x.isspace() for x in Nama))):
+        peringatan = mb.showinfo("Ambil Gambar","Pastikan Wajah yang tertangkap di kamera hanya wajah anda\ndan terdapat cukup sinar untuk kamera mendeteksi muka\nTekan Q untuk keluar dari kamera")   
         cam = cv2.VideoCapture(0)
         harcascadePath = "haarcascade_frontalface_default.xml"
         detector = cv2.CascadeClassifier(cv2.data.haarcascades + harcascadePath)
@@ -256,24 +275,25 @@ def ambilgambar():
                 #increment nomor sample biar bisa dibedakan 
                 nomorSample=nomorSample+1
                 #ssimpan gambar yang ditangkap ke folder GambarTraining
-                cv2.imwrite("D:\python\cobacoba\GambarTraining\ "+Nama +"."+NPM +'.'+ str(nomorSample) + ".jpg", gray[y:y+h,x:x+w])
+                cv2.imwrite("GambarTraining\ "+Nama +"."+NPM +'.'+ str(nomorSample) + ".jpg", gray[y:y+h,x:x+w])
                 #display frame windows
                 cv2.imshow('Deteksi Wajah',img)
             #tunggu 100 milisecond 
             if cv2.waitKey(100) & 0xFF == ord('q'):
                 break
             # break kalo sample udah sampai 50
-            elif nomorSample>=50:
+            elif nomorSample>=100:
                 break
         cam.release()
         cv2.destroyAllWindows() 
-        res = "NPM:" + NPM +" Nama:"+ Nama +" disimpan"
+        res = "Data dengan NPM: " + NPM +" dan Nama: "+ Nama +" disimpan"
         row = [NPM, Nama]
-        with open('D:\python\cobacoba\Mahasiswa\DescMahasiswa.csv','a+') as csvFile:
+        with open('Mahasiswa\DescMahasiswa.csv','a+') as csvFile:
             writer = csv.writer(csvFile)
             writer.writerow(row)
         csvFile.close()
-        message1.configure(text= res,fg='green')
+        #message1.configure(text= res,fg='green')
+        infogambar = mb.showinfo("Data Disimpan",res)
     else:
         if(angka_numerik(NPM)):
             res = "Nama harus berisi huruf abjad"
@@ -319,80 +339,87 @@ def traingambar():
         #$cv2.createLBPHFaceRecognizer()
         harcascadePath = "haarcascade_frontalface_default.xml"
         detector =cv2.CascadeClassifier(harcascadePath)
-        mukamuka,nomormhs = getgambardanlabel("D:\python\cobacoba\GambarTraining")
+        mukamuka,nomormhs = getgambardanlabel("GambarTraining")
         recognizer.train(mukamuka, np.array(nomormhs))
-        recognizer.save("D:\python\cobacoba\hasiltraining\Trainer.yml")
-        res = "Proses Selesai"#+",".join(str(f) for f in Id)
-        message1.configure(text= res,fg='green')
-    except:
-        message1.configure(text="Tidak ada file untuk diproses",fg='red')
+        recognizer.save("hasiltraining\Trainer.yml")
+        res = "Proses training data selesai"#+",".join(str(f) for f in Id)
+        #message1.configure(text= res,fg='green')
+        trainsukses = mb.showinfo("Proses Selesai",res)
+    except :
+        #message1.configure(text="Tidak ada file untuk diproses",fg='red')
+        mb.showerror("No File Found","Tidak ada data gambar dan mahasiswa yang dapat diproses")
 
 
 def kenali_intro():
     if not uye.get():
-        gkadafolder = mb.showinfo("Tidak ada direktori penyimpanan", "Direktori penyimpanan file absensi belum diset.\n File absensi akan disimpan di direktori aplikasi")
-        kenaliwajah('D:\python\cobacoba\Absensi')
+        gkadafolder = mb.showinfo("Tidak ada direktori penyimpanan", "Direktori penyimpanan file absensi belum ditentukan.\n File absensi akan disimpan di direktori aplikasi")
+        kenaliwajah('Absensi')
     else:
         kenaliwajah(uye.get())
 
 
 def kenaliwajah(path):
-    recognizer = cv2.face.LBPHFaceRecognizer_create()#cv2.createLBPHFaceRecognizer()
-    recognizer.read("D:\python\cobacoba\hasiltraining\Trainer.yml")
-    harcascadePath = "D:\python\cobacoba\haarcascade_frontalface_default.xml"
-    faceCascade = cv2.CascadeClassifier(harcascadePath);    
-    df=pd.read_csv("D:\python\cobacoba\Mahasiswa\DescMahasiswa.csv")
-    df.reset_index(drop=True)
-    cam = cv2.VideoCapture(0)
-    font = cv2.FONT_HERSHEY_SIMPLEX        
-    nama_kolom =  ['NPM','Nama','Tanggal','Waktu']
-    absensi = pd.DataFrame(columns = nama_kolom)  
-    
-    while True:
-        ret, im =cam.read()
-        gray=cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
-        mukamuka=faceCascade.detectMultiScale(gray, 1.2,5)    
-        for(x,y,w,h) in mukamuka:
-            cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
-            nomormhs, conf = recognizer.predict(gray[y:y+h,x:x+w])                                   
-            if(conf < 50):
-                ts = time.time()      
-                date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
-                timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
-                aa=df.loc[df['NPM'] == nomormhs]['Nama'].values
-                tt=aa+"_"+str(nomormhs)
-                
-                absensi.loc[len(absensi)] = [nomormhs,aa,date,timeStamp]
-                
-            else:
-                nomormhs='Tidak Dikenal'                
-                tt=str(nomormhs)  
-
-            if(conf > 75):
-                nomorFile=len(os.listdir("D:\python\cobacoba\Takdikenal"))+1
-                cv2.imwrite("D:\python\cobacoba\Takdikenal\Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w])            
-            cv2.putText(im,str(tt),(x,y+h), font, 1,(255,255,255),2)
+    try:
+        recognizer = cv2.face.LBPHFaceRecognizer_create()#cv2.createLBPHFaceRecognizer()
+        recognizer.read("hasiltraining\Trainer.yml")
+        harcascadePath = "haarcascade_frontalface_default.xml"
+        faceCascade = cv2.CascadeClassifier(harcascadePath);    
+        df=pd.read_csv("Mahasiswa\DescMahasiswa.csv")
+        df.reset_index(drop=True)
+        cam = cv2.VideoCapture(0)
+        font = cv2.FONT_HERSHEY_SIMPLEX        
+        nama_kolom =  ['NPM','Nama','Tanggal','Waktu']
+        absensi = pd.DataFrame(columns = nama_kolom)  
         
-        cv2.putText(im,'Tekan Q untuk keluar',(150,470), font, 1,(255,255,255),2,cv2.LINE_AA)        
-        absensi=absensi.drop_duplicates(subset=['NPM'],keep='first')  #biar input absen nggak sama semua timestampnya (hilangin duplikat)   
-        cv2.imshow('Kenali Wajah',im) 
-        if (cv2.waitKey(1)==ord('q')):
-            break
+        while True:
+            ret, im =cam.read()
+            gray=cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+            mukamuka=faceCascade.detectMultiScale(gray, 1.2,5)    
+            for(x,y,w,h) in mukamuka:
+                
+                nomormhs, conf = recognizer.predict(gray[y:y+h,x:x+w])                                   
+                if(conf < 50):
+                    cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
+                    ts = time.time()      
+                    date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
+                    timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+                    aa=df.loc[df['NPM'] == nomormhs]['Nama'].values
+                    tt=aa+"_"+str(nomormhs)
+                    
+                    absensi.loc[len(absensi)] = [nomormhs,aa,date,timeStamp]
+                    
+                else:
+                    cv2.rectangle(im,(x,y),(x+w,y+h),(0,0,255),2)
+                    nomormhs='Tidak Dikenal'                
+                    tt=str(nomormhs)  
 
-    ts = time.time()      
-    date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
-    timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
-    Hour,Minute,Second=timeStamp.split(":")
-    #pathabsensi = uye.get()
-    fileName=path+"\Absensi_"+date+"_"+Hour+"-"+Minute+"-"+Second+".csv"
-    #absensi['Nama'] = absensi['Nama'].str.strip('[]')
-    absensi['Nama'] = absensi['Nama'].str.join(', ')
-    absensi.to_csv(fileName,index=False)
-    cam.release()
-    cv2.destroyAllWindows()
-    #print(absensi)
-    message1.configure(text='Data Absensi Telah Disimpan',fg='green')
-
+                if(conf > 75):
+                    nomorFile=len(os.listdir("Takdikenal"))+1
+                    cv2.imwrite("Takdikenal\Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w])            
+                cv2.putText(im,str(tt),(x,y+h), font, 1,(255,255,255),2)
+            
+            cv2.putText(im,'Tekan Q untuk keluar',(150,470), font, 1,(255,255,255),2,cv2.LINE_AA)        
+            absensi=absensi.drop_duplicates(subset=['NPM'],keep='first')  #biar input absen nggak sama semua timestampnya (hilangin duplikat)   
+            cv2.imshow('Kenali Wajah',im) 
+            if (cv2.waitKey(1)==ord('q')):
+                break
+    
+        ts = time.time()      
+        date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
+        timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+        Hour,Minute,Second=timeStamp.split(":")
+        #pathabsensi = uye.get()
+        fileName=path+"\Absensi_"+date+"_"+Hour+"-"+Minute+"-"+Second+".csv"
+        #absensi['Nama'] = absensi['Nama'].str.strip('[]')
+        absensi['Nama'] = absensi['Nama'].str.join(', ')
+        absensi.to_csv(fileName,index=False)
+        cam.release()
+        cv2.destroyAllWindows()
+        #print(absensi)
+        #message1.configure(text='Data Absensi Telah Disimpan',fg='green')
+        infokenal = mb.showinfo("Data Absensi Disimpan","Data Absensi telah disimpan di direktori yang telah ditentukan")
+    except cv2.error:
+            mb.showerror("No File Found","Tidak ada data file yang dapat diproses")
 
 button1 = Button(window, text="Deteksi Wajah", font=('helvetica', 13, 'bold'), command=ambilgambar)
 button2 = Button(window, text="Proses Data", font=('helvetica', 13, 'bold'), command=traingambar)
