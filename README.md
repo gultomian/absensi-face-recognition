@@ -5,4 +5,11 @@ Menggunakan Haar Cascade Classifier sebagai pendeteksi wajah dan  Local Binary P
 Module OpenCV\
 Module tkinter untuk membuat GUI\
 Module numpy untuk memproses array\
-Module pandas untuk memproses dataframe
+Module pandas untuk memproses dataframe\
+Module csv untuk menyimpan dataframe kedalam file .csv
+# algoritma
+Aplikasi akan mendeteksi muka menggunakan metoda Cascade Classfier dari fitur Haar lalu membuat bounding box diantara muka saat didisplay. Aplikasi akan otomatis menangkap 100 foto tiap 100 milisecond untuk digunakan sebagai baham training. Label gambar akan diambil dari NPM dan Nama dari mahasiswa yang sudah di-input sebelumnnya\
+\
+Selanjutnya, aplikasi akan mentraining data gambar dan label menggunakan algoritma gabungan LBP dan HOG yaitu LBPH. Data gambar dikonversi kedalam bentuk histogram lalu dicek jika ada kontras antar pixel yang menunjukan kontur muka. Data histogram kemudian di-konversi kembali menjadi data vektor dalam format .yaml agar bisa diproses saat pengenalan Wajah\
+\
+Terakhir, pada pengenalan wajah aplikasi akan mengambil Haar Cascade Classifier untuk mendeteksi wajah, dan hasil data training untuk pengenalan wajah. Aplikasi akan mendeteksi wajah yang terdeteksi pada kamera lalu mengubahnya kedalam bentuk histogram dan membandingkannya dengan histogram dari data vektor hasil training sebelumnya. Jika ditemukan kecocokan, aplikasi akan mengambil label dari data yang cocok dan mendisplaynya di layar kamera lalu disimpan kedalam database yang berformat .csv
