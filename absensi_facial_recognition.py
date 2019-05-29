@@ -438,7 +438,7 @@ def kenaliwajah(path):
         #message1.configure(text='Data Absensi Telah Disimpan',fg='green')
         infokenal = mb.showinfo("Data Absensi Disimpan","Data Absensi telah disimpan di direktori yang telah ditentukan")
     except cv2.error:
-            mb.showerror("No File Found","Tidak ada data file yang dapat diproses")
+        mb.showerror("No File Found","Tidak ada data file yang dapat diproses")
 
 button1 = Button(window, text="Deteksi Wajah", font=('helvetica', 13, 'bold'), command=ambilgambar)
 button2 = Button(window, text="Proses Data", font=('helvetica', 13, 'bold'), command=traingambar)
