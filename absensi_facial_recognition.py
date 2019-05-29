@@ -260,11 +260,16 @@ def ambilgambar():
     if(angka_numerik(NPM) and (any(x.isalpha() for x in Nama) 
     and any(x.isspace() for x in Nama) 
     or all(x.isalpha() or x.isspace() for x in Nama))):
-        peringatan = mb.showinfo("Ambil Gambar","Pastikan Wajah yang tertangkap di kamera hanya wajah anda\ndan terdapat cukup sinar untuk kamera mendeteksi muka\nTekan Q untuk keluar dari kamera")   
+        mb.showinfo("Ambil Gambar","Pastikan Wajah yang tertangkap di kamera hanya wajah anda\ndan terdapat cukup sinar untuk kamera mendeteksi muka\nTekan Q untuk keluar dari kamera")   
         cam = cv2.VideoCapture(0)
         harcascadePath = "haarcascade_frontalface_default.xml"
         detector = cv2.CascadeClassifier(cv2.data.haarcascades + harcascadePath)
         nomorSample=0
+        width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
+        height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT) # float
+
+        teksx = int(width / 2) - int(width/4)
+        teksy = int((95/100)* height)
         while(True):
             ret, img = cam.read()
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -272,7 +277,7 @@ def ambilgambar():
             muka = detector.detectMultiScale(gray, 1.3, 5)
             for (x,y,w,h) in muka:
                 cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-                cv2.putText(img,'Tunggu Beberapa Detik',(150,470), font, 1,(255,255,255),2,cv2.LINE_AA)        
+                cv2.putText(img,'Tunggu Beberapa Detik',(teksx,teksy), font, 1,(255,255,255),2,cv2.LINE_AA)        
                 #increment nomor sample biar bisa dibedakan 
                 nomorSample=nomorSample+1
                 #ssimpan gambar yang ditangkap ke folder GambarTraining
@@ -294,7 +299,7 @@ def ambilgambar():
             with open('Mahasiswa\DescMahasiswa.csv', mode='w', newline='') as file_output:
                 file_csv = csv.writer(file_output)
                 file_csv.writerow(['NPM', 'Nama'])
-                file_output.close()
+            file_output.close()
             with open('Mahasiswa\DescMahasiswa.csv',mode='a+', newline='') as csvFile:
                 writer = csv.writer(csvFile)
                 writer.writerow(row)
@@ -316,10 +321,6 @@ def ambilgambar():
         if(len(NPM) <=0 or len(Nama)<=0):
             res = "Kedua form harus dilengkapi"
             message1.configure(text= res,fg='red')
-    
-    
-
-
 
 def getgambardanlabel(path):
     #ambil path dari file di folder
@@ -410,7 +411,13 @@ def kenaliwajah(path):
                     cv2.imwrite("Takdikenal\Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w])            
                 cv2.putText(im,str(tt),(x,y+h), font, 1,(255,255,255),2)
             
-            cv2.putText(im,'Tekan Q untuk keluar',(150,470), font, 1,(255,255,255),2,cv2.LINE_AA)        
+            width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
+            height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT) # float
+
+            teksx = int(width / 2) - int(width/4)
+            teksy = int((95/100)* height)
+
+            cv2.putText(im,'Tekan Q untuk keluar',(teksx,teksy), font, 1,(255,255,255),2,cv2.LINE_AA)        
             absensi=absensi.drop_duplicates(subset=['NPM'],keep='first')  #biar input absen nggak sama semua timestampnya (hilangin duplikat)   
             cv2.imshow('Kenali Wajah',im) 
             if (cv2.waitKey(1)==ord('q')):
