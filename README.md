@@ -8,7 +8,7 @@ Module numpy untuk memproses array\
 Module pandas untuk memproses dataframe\
 Module csv untuk menyimpan dataframe kedalam file .csv
 # algoritma
-Aplikasi akan mendeteksi muka menggunakan metoda Cascade Classfier dari fitur Haar lalu membuat bounding box diantara muka saat didisplay. Aplikasi akan otomatis menangkap 100 foto tiap 100 milisecond untuk digunakan sebagai baham training. Label gambar akan diambil dari NPM dan Nama dari mahasiswa yang sudah di-input sebelumnnya\
+Aplikasi akan mendeteksi muka menggunakan algoritma Cascade Classfier dari fitur Haar lalu membuat bounding box diantara muka saat didisplay. Aplikasi akan otomatis menangkap 100 foto tiap 100 milisecond untuk digunakan sebagai baham training. Label gambar akan diambil dari NPM dan Nama dari mahasiswa yang sudah di-input sebelumnnya\
 \
 Selanjutnya, aplikasi akan mentraining data gambar dan label menggunakan algoritma gabungan LBP dan HOG yaitu LBPH. Data gambar dikonversi kedalam bentuk histogram lalu dicek jika ada kontras antar pixel yang menunjukan kontur muka. Data histogram kemudian di-konversi kembali menjadi data vektor dalam format .yaml agar bisa diproses saat pengenalan Wajah\
 \
