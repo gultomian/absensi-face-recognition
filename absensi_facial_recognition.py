@@ -12,6 +12,7 @@ from datetime import date
 import time
 import glob
 import os.path
+import shutil
 import operator
 
 window = Tk()
@@ -58,15 +59,16 @@ message1.place(x=250, y=280, anchor='center')
 pembuat.place(x=250, y=365, anchor='center')
 
 def read_kelas():
+    combokelas.set('')
     combokelas['values']=('')
     try:
+        pd.read_csv('Mahasiswa\daftarkelas.csv')
         with open('Mahasiswa\daftarkelas.csv', newline='') as f:
             data = list(csv.reader(f))
             new_data = [a for i, a in enumerate(data) if a not in data[:i]]
             with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as t:
                 write = csv.writer(t)
                 write.writerows(new_data)
-
         with open('Mahasiswa\daftarkelas.csv', newline='') as csvfile:
             spamreader = csv.reader(csvfile , delimiter='"') 
             sortedlist = sorted(spamreader, key=operator.itemgetter(0))
@@ -79,9 +81,10 @@ def read_kelas():
                 Tup1 = tuple(Lst1)
 
         combokelas['values']=(Tup1)
-        
     except(FileNotFoundError):
         combokelas['values']=('')
+    except(pd.errors.EmptyDataError):
+        os.remove('Mahasiswa\daftarkelas.csv')
 read_kelas()
 
 #--------------Dropdown Menu----------------
@@ -99,8 +102,8 @@ uye = StringVar()
 
 def set_kelas():
     kelaswin = Toplevel(window)
-    kelaswin.title("Set Kelas")
-    kelaswin.iconbitmap("D:\python\kameraHP\ikon.ico")
+    kelaswin.title("Kelas")
+    kelaswin.iconbitmap("ikon.ico")
     width = 330
     height = 90
     screen_width = kelaswin.winfo_screenwidth()
@@ -109,10 +112,16 @@ def set_kelas():
     y = (screen_height/2) - (height/2)
     kelaswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
     kelaswin.resizable(0,0)
-    labelkelas = Label(kelaswin, text="Nama Kelas (pakai ',' untuk banyak kelas):",font=('helvetica', 9))
-    entrykelas = Entry(kelaswin,width=30,font=('helvetica', 10))
-    labelkelas.place(x=29, y=5)
-    entrykelas.place(x=30, y=25)
+    
+    frame1 = Frame(kelaswin)
+    frame2 = Frame(frame1)
+    frame1.pack(side=TOP, anchor=CENTER, pady=5)
+    labelkelas = Label(frame1, text="Nama Kelas (pakai ',' untuk banyak kelas):",font=('helvetica', 9))
+    labelkelas.pack(side=TOP, anchor=W)
+    frame2.pack(side=TOP, anchor=CENTER)
+    
+    entrykelas = Entry(frame2,width=30, font=('helvetica', 10))
+    entrykelas.pack(side=LEFT, anchor=W)
 
     
     def input_nama_kelas():
@@ -123,6 +132,8 @@ def set_kelas():
         else:
             result = [x.strip() for x in nama_kls.split(',')]
             #res = [[result[0], x] for x in result[1:]]
+            if not os.path.isdir('Mahasiswa/'):
+                os.mkdir('Mahasiswa/')
             with open('Mahasiswa\daftarkelas.csv','a+', newline='') as csvfile:
                 writer = csv.writer(csvfile, delimiter='\n') 
                 #writer.writerow(','.join(Tup1))
@@ -132,20 +143,169 @@ def set_kelas():
                 mb.showinfo("Input Kelas","Nama kelas berhasil dimasukkan") 
                 kelaswin.focus_set() 
         
-    def hapus_daftar_kelas():
-        tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus daftar kelas?',icon = 'warning')
-        if tanyahapus == 'yes':
-            os.remove("Mahasiswa\daftarkelas.csv")
-            combokelas.set('')
-            kelaswin.focus_set()
-            read_kelas()
-        elif tanyahapus == 'no':
-            kelaswin.focus_set()
+    
+
+    def hapus_kelas():
+        hapuskelaswin = Toplevel(window)
+        hapuskelaswin.title("Hapus Kelas")
+        hapuskelaswin.iconbitmap("ikon.ico")
+        hapuskelaswin.grab_set()
+        
+        width = 310
+        height = 145
+        screen_width = hapuskelaswin.winfo_screenwidth()
+        screen_height = hapuskelaswin.winfo_screenheight()
+        x = (screen_width/2) - (width/2)
+        y = (screen_height/2) - (height/2)
+        hapuskelaswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
+        hapuskelaswin.resizable(0,0)
+        
+
+        #sizea = (65/100)*height
+        #sizeb = height-sizea
+
+        framea = Frame(hapuskelaswin)
+        frameb = Frame(hapuskelaswin)
+        framea.pack(side =TOP, pady=5)
+        frameb.pack(side=TOP, pady=5)
+        
+
+        labeldelete = Label(framea, text= 'Cari Entry Kelas')
+        labeldelete.pack(anchor = CENTER)
+
+        combodelete = ttk.Combobox(framea,state="readonly")
+        combodelete.pack(side=TOP)
+
+        checkvar = IntVar()
+        checkdelete = ttk.Checkbutton(framea, text = 'Hapus beserta folder kelas', variable=checkvar)
+        checkdelete.pack(side=TOP)
+
+        def readdelete():
+            combodelete.set('')
+            combodelete['values']=('')
+            try:
+                with open('Mahasiswa\daftarkelas.csv', newline='') as f:
+                    data = list(csv.reader(f))
+                    new_data = [a for i, a in enumerate(data) if a not in data[:i]]
+                    with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as t:
+                        write = csv.writer(t)
+                        write.writerows(new_data)
+
+                with open('Mahasiswa\daftarkelas.csv', newline='') as csvfile:
+                    spamreader = csv.reader(csvfile , delimiter='"') 
+                    sortedlist = sorted(spamreader, key=operator.itemgetter(0))
+                    Tup1 = ()
+                    Lst1 = ()
+                    for row in sortedlist:
+                        #print(','.join(row))
+                        Lst1 = list(Tup1)
+                        Lst1.append(','.join(row))
+                        Tup1 = tuple(Lst1)
+
+                combodelete['values']=(Tup1)
+                
+            except(FileNotFoundError):
+                combodelete['values']=('')
+
+        readdelete()
+
+        def hapus_satuan_kelas():
+            kelashapus = combodelete.get()
+            if checkvar.get() == 0:
+                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus kelas '+kelashapus+'?',icon = 'warning')
+                if tanyahapus == 'yes':
+                    with open ('Mahasiswa\daftarkelas.csv', 'r') as f:
+                        reader = csv.reader(f)
+                        list_kelas = list(reader)
+                    list_kelas = [i[0] for i in list_kelas]
+                    list_kelas.remove(kelashapus)
+                    os.remove("Mahasiswa\daftarkelas.csv")
+                    with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as myfile:
+                        wr = csv.writer(myfile, delimiter='\n')
+                        wr.writerow(list_kelas)
+                        myfile.close()
+                        combodelete.set('')
+                        read_kelas()
+                        try:
+                            readdelete()
+                        except(IndexError):
+                            pass
+                        hapuskelaswin.focus_set() 
+                elif tanyahapus == 'no':
+                    hapuskelaswin.focus_set() 
+
+            elif checkvar.get() == 1:
+                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus kelas '+kelashapus+' beserta direktorinya?',icon = 'warning')
+                if tanyahapus == 'yes':
+                    try:
+                        shutil.rmtree('Mahasiswa/'+kelashapus+'/')
+                    except(FileNotFoundError):
+                        pass
+                    with open ('Mahasiswa\daftarkelas.csv', 'r') as f:
+                        reader = csv.reader(f)
+                        list_kelas = list(reader)
+                    list_kelas = [i[0] for i in list_kelas]
+                    list_kelas.remove(kelashapus)
+                    os.remove("Mahasiswa\daftarkelas.csv")
+                    with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as myfile:
+                        wr = csv.writer(myfile, delimiter='\n')
+                        wr.writerow(list_kelas)
+                        myfile.close()
+                        combodelete.set('')
+                        read_kelas()
+                        try:
+                            readdelete()
+                        except(IndexError):
+                            pass
+                        hapuskelaswin.focus_set() 
+                elif tanyahapus == 'no':
+                    hapuskelaswin.focus_set() 
+
+
+
+        def hapus_daftar_kelas():
+            if checkvar.get() == 0:
+                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus semua kelas?',icon = 'warning')
+                if tanyahapus == 'yes':
+                    try:
+                        os.remove("Mahasiswa\daftarkelas.csv")
+                    except(FileNotFoundError):
+                        pass
+                    combokelas.set('')
+                    hapuskelaswin.focus_set()
+                    readdelete()
+                elif tanyahapus == 'no':
+                    hapuskelaswin.focus_set()
+
+            elif checkvar.get() == 1:
+                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus semua kelas dan direktorinya?',icon = 'warning')
+                if tanyahapus == 'yes':
+                    try:
+                        shutil.rmtree("Mahasiswa/")
+                    except(FileNotFoundError):
+                        pass
+                    os.mkdir('Mahasiswa/')
+                    combokelas.set('')
+                    hapuskelaswin.focus_set()
+                    readdelete()
+                elif tanyahapus == 'no':
+                    hapuskelaswin.focus_set()
+
+        
+        
+        buttonhapus = Button(frameb, text= 'Hapus', width= 10, command = hapus_satuan_kelas)
+        buttonhapus.pack(side=LEFT, anchor = CENTER, padx=5)
+        
+        buttonhapusALL = Button(hapuskelaswin, text= 'Hapus Semua Kelas', width= 20, command = hapus_daftar_kelas)
+        buttonhapusALL.pack(side=TOP, anchor = CENTER, padx=5)
+
             
-    buttonkelas = Button(kelaswin, text="Set Kelas", font=('helvetica', 9),command=input_nama_kelas)
-    buttonhapuskelas = Button(kelaswin, text="Hapus Daftar Kelas", font=('helvetica', 9),command=hapus_daftar_kelas)
-    buttonkelas.place(x=250, y=22)
-    buttonhapuskelas.place(x=30, y=50)
+    buttonkelas = Button(frame2, text="Tambah", font=('helvetica', 9),width = 10, command=input_nama_kelas)
+    #buttonhapuskelasALL = Button(frame2, text="Hapus Daftar Kelas", font=('helvetica', 9),command=hapus_daftar_kelas)
+    buttonhapuskelas = Button(frame1, text="Hapus Kelas", width = 15, command = hapus_kelas)
+    buttonkelas.pack(side= LEFT, padx=5)
+    #buttonhapuskelasALL.pack(side=LEFT, anchor=W)
+    buttonhapuskelas.pack(side=TOP, anchor=W, pady=5)
 
 def keluar():
     tanya_keluar = mb.askquestion ('Keluar','Anda yakin ingin keluar aplikasi?',icon = 'warning')
@@ -284,7 +444,7 @@ def viewabs():
         datacsv.set(file_absen)
         abswin.focus_set()
         pathabs = datacsv.get()
-        tampil_path.configure(text='Menampilkan absensi untuk '+pathabs, fg='green')
+        tampil_path.configure(text=pathabs, fg='green')
        
 
         tree.delete(*tree.get_children())
@@ -356,8 +516,7 @@ def tentang():
 dropdown_view.add_command(label='Absensi', command=viewabs)
 dropdown_view.add_command(label='Mahasiswa', command=viewmhs)
 dropdown_file.add_command(label='Set Folder Absensi...',command=pathabsensi)
-dropdown_file.add_command(label='Set Kelas...',command=set_kelas)
-
+dropdown_file.add_command(label='Kelas...',command=set_kelas)
 dropdown_file.add_separator()
 dropdown_file.add_command(label='Keluar',command=keluar)
 dropdown_help.add_command(label='Penggunaan',command=penggunaan)
@@ -491,6 +650,7 @@ def train_intro():
     intro_train = Toplevel(window)
     intro_train.iconbitmap("ikon.ico")
     intro_train.title("Proses Training Data")
+    intro_train.grab_set()
     
     width = 300
     height = 100
@@ -502,7 +662,7 @@ def train_intro():
     intro_train.resizable(0,0)
 
     label_cari = Label(intro_train, text='Cari Kelas: ',font=('helvetica', 13))
-    label_cari.pack(side=TOP)
+    label_cari.pack(side=TOP, pady=5)
     kombo_kelas = ttk.Combobox(intro_train, width =20,state="readonly",font=('helvetica', 13))
     kombo_kelas.pack(side=TOP, anchor = CENTER)
 
@@ -544,6 +704,8 @@ def train_intro():
     button_cari = Button(intro_train,text='Proses',font=('helvetica', 13, 'bold'),command=button_train)
     button_cari.pack(side=TOP, anchor = CENTER)
     
+    return intro_train
+
 def traingambar(path):
     try:
         time.sleep(2)
@@ -570,7 +732,8 @@ def kenali_intro():
     intro_recog = Toplevel(window)
     intro_recog.iconbitmap("ikon.ico")
     intro_recog.title("Pengenalan Data")
-    
+    intro_recog.grab_set()
+
     width = 300
     height = 100
     screen_width = intro_recog.winfo_screenwidth()
@@ -581,7 +744,7 @@ def kenali_intro():
     intro_recog.resizable(0,0)
 
     label_cari = Label(intro_recog, text='Cari Kelas: ',font=('helvetica', 13))
-    label_cari.pack(side=TOP)
+    label_cari.pack(side=TOP, pady=5)
     kombo_kelas = ttk.Combobox(intro_recog, width =20,state="readonly",font=('helvetica', 13))
     kombo_kelas.pack(side=TOP, anchor = CENTER)
 
