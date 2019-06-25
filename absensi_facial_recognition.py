@@ -19,7 +19,7 @@ window = Tk()
 #window.geometry("500x400")
 window.iconbitmap("ikon.ico")
 window.title("Absensi Facial Recognition")
-window.configure(background='#f3f3f3')
+window.configure(background='#f1f0f0')
 #window.resizable(0,0)
 
 width = 500
@@ -29,7 +29,7 @@ screen_height = window.winfo_screenheight()
 x = (screen_width/2) - (width/2)
 y = (screen_height/2) - (height/2)
 window.geometry("%dx%d+%d+%d" % (width, height, x, y))
-window.resizable(0,0)
+window.resizable(0, 0)
 
 logo = Image.open("logo.jpg")
 renderlogo = ImageTk.PhotoImage(logo)
@@ -39,14 +39,13 @@ img = Label(window, image=renderlogo)
 img.image = renderlogo
 img.place(x=50, y=30)
 
-lbl = Label(window, text="NPM",font=('helvetica', 15))
-entry1 = Entry(window,width=22, font=('helvetica', 15))
-lbl2 = Label(window, text="Nama",font=('helvetica', 15))
-entry2 = Entry(window,width=22,font=('helvetica', 15))
-lbl3 = Label(window, text="Kelas",font=('helvetica', 15))
-combokelas = ttk.Combobox(window, width =20,state="readonly",font=('helvetica', 15))
-message1 = Label(window, text="",font=('helvetica', 15))
-pembuat = Label(window, text="Dibuat oleh Christian Daomara",font=('helvetica', 9))
+lbl = Label(window, text="NPM", font=('helvetica', 15))
+entry1 = Entry(window, width=22, font=('helvetica', 15))
+lbl2 = Label(window, text="Nama", font=('helvetica', 15))
+entry2 = Entry(window, width=22, font=('helvetica', 15))
+lbl3 = Label(window, text="Kelas", font=('helvetica', 15))
+combokelas = ttk.Combobox(window, width=20, state="readonly", font=('helvetica', 15))
+message1 = Label(window, text="", font=('helvetica', 15))
 
 lbl.place(x=50, y=175)
 lbl2.place(x=50, y=205)
@@ -56,21 +55,21 @@ entry2.place(x=194, y=205)
 combokelas.place(x=194, y=235)
 
 message1.place(x=250, y=280, anchor='center')
-pembuat.place(x=250, y=365, anchor='center')
+
 
 def read_kelas():
     combokelas.set('')
-    combokelas['values']=('')
+    combokelas['values'] =('')
     try:
-        pd.read_csv('Mahasiswa\daftarkelas.csv')
-        with open('Mahasiswa\daftarkelas.csv', newline='') as f:
+        pd.read_csv('Mahasiswa/daftarkelas.csv')
+        with open('Mahasiswa/daftarkelas.csv', newline='') as f:
             data = list(csv.reader(f))
-            new_data = [a for i, a in enumerate(data) if a not in data[:i]]
-            with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as t:
+            new_data = [a for i, a in enumerate(data) if a not in data[:i]] #hapus data duplikat
+            with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as t:
                 write = csv.writer(t)
                 write.writerows(new_data)
-        with open('Mahasiswa\daftarkelas.csv', newline='') as csvfile:
-            spamreader = csv.reader(csvfile , delimiter='"') 
+        with open('Mahasiswa/daftarkelas.csv', newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter='"') 
             sortedlist = sorted(spamreader, key=operator.itemgetter(0))
             Tup1 = ()
             Lst1 = ()
@@ -79,12 +78,11 @@ def read_kelas():
                 Lst1 = list(Tup1)
                 Lst1.append(','.join(row))
                 Tup1 = tuple(Lst1)
-
-        combokelas['values']=(Tup1)
-    except(FileNotFoundError):
-        combokelas['values']=('')
-    except(pd.errors.EmptyDataError):
-        os.remove('Mahasiswa\daftarkelas.csv')
+        combokelas['values'] =(Tup1)
+    except FileNotFoundError:
+        combokelas['values'] =('')
+    except pd.errors.EmptyDataError:
+        os.remove('Mahasiswa/daftarkelas.csv')
 read_kelas()
 
 #--------------Dropdown Menu----------------
@@ -111,15 +109,13 @@ def set_kelas():
     x = (screen_width/2) - (width/2)
     y = (screen_height/2) - (height/2)
     kelaswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
-    kelaswin.resizable(0,0)
-    
+    kelaswin.resizable(0, 0)   
     frame1 = Frame(kelaswin)
     frame2 = Frame(frame1)
     frame1.pack(side=TOP, anchor=CENTER, pady=5)
-    labelkelas = Label(frame1, text="Nama Kelas (pakai ',' untuk banyak kelas):",font=('helvetica', 9))
+    labelkelas = Label(frame1, text="Nama Kelas (Gunakan koma untuk jamak):", font=('helvetica', 9))
     labelkelas.pack(side=TOP, anchor=W)
     frame2.pack(side=TOP, anchor=CENTER)
-    
     entrykelas = Entry(frame2,width=30, font=('helvetica', 10))
     entrykelas.pack(side=LEFT, anchor=W)
 
@@ -127,20 +123,20 @@ def set_kelas():
     def input_nama_kelas():
         nama_kls = (entrykelas.get())
         if nama_kls == '':
-            mb.showerror('Tidak ada Input','Input kelas belum dimasukkan')
+            mb.showerror('Tidak ada Input', 'Input kelas belum dimasukkan')
             kelaswin.focus_set()
         else:
             result = [x.strip() for x in nama_kls.split(',')]
             #res = [[result[0], x] for x in result[1:]]
             if not os.path.isdir('Mahasiswa/'):
                 os.mkdir('Mahasiswa/')
-            with open('Mahasiswa\daftarkelas.csv','a+', newline='') as csvfile:
+            with open('Mahasiswa/daftarkelas.csv', 'a+', newline='') as csvfile:
                 writer = csv.writer(csvfile, delimiter='\n') 
                 #writer.writerow(','.join(Tup1))
                 writer.writerow(result)  
                 csvfile.close()
                 read_kelas()
-                mb.showinfo("Input Kelas","Nama kelas berhasil dimasukkan") 
+                mb.showinfo("Input Kelas", "Nama kelas berhasil dimasukkan") 
                 kelaswin.focus_set() 
         
     
@@ -150,15 +146,15 @@ def set_kelas():
         hapuskelaswin.title("Hapus Kelas")
         hapuskelaswin.iconbitmap("ikon.ico")
         hapuskelaswin.grab_set()
-        
-        width = 310
+
+        width = 250
         height = 145
         screen_width = hapuskelaswin.winfo_screenwidth()
         screen_height = hapuskelaswin.winfo_screenheight()
         x = (screen_width/2) - (width/2)
         y = (screen_height/2) - (height/2)
         hapuskelaswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
-        hapuskelaswin.resizable(0,0)
+        hapuskelaswin.resizable(0, 0)
         
 
         #sizea = (65/100)*height
@@ -166,33 +162,33 @@ def set_kelas():
 
         framea = Frame(hapuskelaswin)
         frameb = Frame(hapuskelaswin)
-        framea.pack(side =TOP, pady=5)
+        framea.pack(side=TOP, pady=5)
         frameb.pack(side=TOP, pady=5)
         
 
-        labeldelete = Label(framea, text= 'Cari Entry Kelas')
-        labeldelete.pack(anchor = CENTER)
+        labeldelete = Label(framea, text='Cari Entry Kelas')
+        labeldelete.pack(anchor=CENTER)
 
-        combodelete = ttk.Combobox(framea,state="readonly")
+        combodelete = ttk.Combobox(framea, state="readonly")
         combodelete.pack(side=TOP)
 
         checkvar = IntVar()
-        checkdelete = ttk.Checkbutton(framea, text = 'Hapus beserta folder kelas', variable=checkvar)
+        checkdelete = ttk.Checkbutton(framea, text='Hapus beserta folder kelas', variable=checkvar)
         checkdelete.pack(side=TOP)
 
         def readdelete():
             combodelete.set('')
             combodelete['values']=('')
             try:
-                with open('Mahasiswa\daftarkelas.csv', newline='') as f:
+                with open('Mahasiswa/daftarkelas.csv', newline='') as f:
                     data = list(csv.reader(f))
                     new_data = [a for i, a in enumerate(data) if a not in data[:i]]
-                    with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as t:
+                    with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as t:
                         write = csv.writer(t)
                         write.writerows(new_data)
 
-                with open('Mahasiswa\daftarkelas.csv', newline='') as csvfile:
-                    spamreader = csv.reader(csvfile , delimiter='"') 
+                with open('Mahasiswa/daftarkelas.csv', newline='') as csvfile:
+                    spamreader = csv.reader(csvfile, delimiter='"') 
                     sortedlist = sorted(spamreader, key=operator.itemgetter(0))
                     Tup1 = ()
                     Lst1 = ()
@@ -204,7 +200,7 @@ def set_kelas():
 
                 combodelete['values']=(Tup1)
                 
-            except(FileNotFoundError):
+            except FileNotFoundError:
                 combodelete['values']=('')
 
         readdelete()
@@ -212,15 +208,15 @@ def set_kelas():
         def hapus_satuan_kelas():
             kelashapus = combodelete.get()
             if checkvar.get() == 0:
-                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus kelas '+kelashapus+'?',icon = 'warning')
+                tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus kelas '+kelashapus+'?', icon='warning')
                 if tanyahapus == 'yes':
-                    with open ('Mahasiswa\daftarkelas.csv', 'r') as f:
+                    with open('Mahasiswa/daftarkelas.csv', 'r') as f:
                         reader = csv.reader(f)
                         list_kelas = list(reader)
                     list_kelas = [i[0] for i in list_kelas]
                     list_kelas.remove(kelashapus)
-                    os.remove("Mahasiswa\daftarkelas.csv")
-                    with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as myfile:
+                    os.remove("Mahasiswa/daftarkelas.csv")
+                    with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as myfile:
                         wr = csv.writer(myfile, delimiter='\n')
                         wr.writerow(list_kelas)
                         myfile.close()
@@ -228,26 +224,26 @@ def set_kelas():
                         read_kelas()
                         try:
                             readdelete()
-                        except(IndexError):
+                        except IndexError:
                             pass
                         hapuskelaswin.focus_set() 
                 elif tanyahapus == 'no':
                     hapuskelaswin.focus_set() 
 
             elif checkvar.get() == 1:
-                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus kelas '+kelashapus+' beserta direktorinya?',icon = 'warning')
+                tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus kelas '+kelashapus+' beserta direktorinya?', icon='warning')
                 if tanyahapus == 'yes':
                     try:
                         shutil.rmtree('Mahasiswa/'+kelashapus+'/')
-                    except(FileNotFoundError):
+                    except FileNotFoundError:
                         pass
-                    with open ('Mahasiswa\daftarkelas.csv', 'r') as f:
+                    with open('Mahasiswa/daftarkelas.csv', 'r') as f:
                         reader = csv.reader(f)
                         list_kelas = list(reader)
                     list_kelas = [i[0] for i in list_kelas]
                     list_kelas.remove(kelashapus)
-                    os.remove("Mahasiswa\daftarkelas.csv")
-                    with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as myfile:
+                    os.remove("Mahasiswa/daftarkelas.csv")
+                    with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as myfile:
                         wr = csv.writer(myfile, delimiter='\n')
                         wr.writerow(list_kelas)
                         myfile.close()
@@ -255,7 +251,7 @@ def set_kelas():
                         read_kelas()
                         try:
                             readdelete()
-                        except(IndexError):
+                        except IndexError:
                             pass
                         hapuskelaswin.focus_set() 
                 elif tanyahapus == 'no':
@@ -265,79 +261,72 @@ def set_kelas():
 
         def hapus_daftar_kelas():
             if checkvar.get() == 0:
-                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus semua kelas?',icon = 'warning')
+                tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus semua kelas?', icon ='warning')
                 if tanyahapus == 'yes':
                     try:
-                        os.remove("Mahasiswa\daftarkelas.csv")
-                    except(FileNotFoundError):
+                        os.remove("Mahasiswa/daftarkelas.csv")
+                    except FileNotFoundError:
                         pass
                     combokelas.set('')
                     hapuskelaswin.focus_set()
                     readdelete()
+                    read_kelas()
                 elif tanyahapus == 'no':
                     hapuskelaswin.focus_set()
 
             elif checkvar.get() == 1:
-                tanyahapus = mb.askquestion ('Hapus?','Anda yakin ingin menghapus semua kelas dan direktorinya?',icon = 'warning')
+                tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus semua kelas dan direktorinya?', icon='warning')
                 if tanyahapus == 'yes':
                     try:
                         shutil.rmtree("Mahasiswa/")
-                    except(FileNotFoundError):
+                        os.mkdir('Mahasiswa')
+                    except FileNotFoundError:
                         pass
-                    os.mkdir('Mahasiswa/')
+                    except PermissionError:
+                        os.mkdir('Mahasiswa/')
                     combokelas.set('')
                     hapuskelaswin.focus_set()
                     readdelete()
+                    read_kelas()
                 elif tanyahapus == 'no':
                     hapuskelaswin.focus_set()
-
-        
-        
         buttonhapus = Button(frameb, text= 'Hapus', width= 10, command = hapus_satuan_kelas)
         buttonhapus.pack(side=LEFT, anchor = CENTER, padx=5)
-        
         buttonhapusALL = Button(hapuskelaswin, text= 'Hapus Semua Kelas', width= 20, command = hapus_daftar_kelas)
-        buttonhapusALL.pack(side=TOP, anchor = CENTER, padx=5)
-
-            
-    buttonkelas = Button(frame2, text="Tambah", font=('helvetica', 9),width = 10, command=input_nama_kelas)
+        buttonhapusALL.pack(side=TOP, anchor = CENTER, padx=5)       
+    buttonkelas = Button(frame2, text="Tambah", font=('helvetica', 9), width = 10, command=input_nama_kelas)
     #buttonhapuskelasALL = Button(frame2, text="Hapus Daftar Kelas", font=('helvetica', 9),command=hapus_daftar_kelas)
-    buttonhapuskelas = Button(frame1, text="Hapus Kelas", width = 15, command = hapus_kelas)
+    buttonhapuskelas = Button(frame1, text="Hapus Kelas", width=15, command=hapus_kelas)
     buttonkelas.pack(side= LEFT, padx=5)
     #buttonhapuskelasALL.pack(side=LEFT, anchor=W)
     buttonhapuskelas.pack(side=TOP, anchor=W, pady=5)
-
 def keluar():
-    tanya_keluar = mb.askquestion ('Keluar','Anda yakin ingin keluar aplikasi?',icon = 'warning')
+    tanya_keluar = mb.askquestion('Keluar', 'Anda yakin ingin keluar aplikasi?', icon='warning')
     if tanya_keluar == 'yes':
-       window.quit()
-    
+        window.quit()
 def pathabsensi():
     global uye
-    folder_pilihan = fd.askdirectory(title= 'Pilih Folder Absensi')
+    folder_pilihan = fd.askdirectory(title='Pilih Folder Absensi')
     uye.set(folder_pilihan)
-
 def penggunaan():
     penggunaanwin = Toplevel(window)
     penggunaanwin.iconbitmap("ikon.ico")
     penggunaanwin.title("Penggunaan")
     penggunaanwin.geometry('800x100')
     penggunaanwin.resizable(0,0)
-    text_penggunaan = Text(penggunaanwin,font= ('helvetica',11,'bold'), height=30,width=300)
+    text_penggunaan = Text(penggunaanwin, font= ('helvetica', 11, 'bold'), height=30, width=300)
     text_penggunaan.config(state='normal')
-    text_penggunaan.insert(INSERT,"1.   Set folder tempat penyimpanan file absensi di dropdown menu 'Set Folder Absensi'.\n")
-    text_penggunaan.insert(INSERT,"2.   Mulai mengambil gambar muka dengan memasukan NPM dan Nama dan mengklik tombol Deteksi Wajah.\n")
-    text_penggunaan.insert(INSERT,"3.   Setelah gambar wajah diambil, mulai memproses data gambar dengan mengklik Proses Data.\n")
-    text_penggunaan.insert(INSERT,"4.   Setelah Proses selesai, mulai pengenalan wajah dengan mengklik Kenali Wajah.\n")
-    text_penggunaan.insert(INSERT,"5.   Hasil Pengenalan Wajah  akan di buat menjadi file .csv dan disimpan di folder yang sudah di-set sebelumnya.")
+    text_penggunaan.insert(INSERT, "1.   Set folder tempat penyimpanan file absensi di dropdown menu 'Set Folder Absensi'.\n")
+    text_penggunaan.insert(INSERT, "2.   Mulai mengambil gambar muka dengan memasukan NPM dan Nama dan mengklik tombol Deteksi Wajah.\n")
+    text_penggunaan.insert(INSERT, "3.   Setelah gambar wajah diambil, mulai memproses data gambar dengan mengklik Proses Data.\n")
+    text_penggunaan.insert(INSERT, "4.   Setelah Proses selesai, mulai pengenalan wajah dengan mengklik Kenali Wajah.\n")
+    text_penggunaan.insert(INSERT, "5.   Hasil Pengenalan Wajah  akan di buat menjadi file .csv dan disimpan di folder yang sudah di-set sebelumnya.")
     text_penggunaan.config(state='disabled')
     text_penggunaan.pack()
-
 def viewmhs():
     mhswin = Toplevel(window)
     mhswin.iconbitmap("ikon.ico")
     mhswin.title("Daftar Mahasiswa")
-    
     width = 400
     height = 400
     screen_width = mhswin.winfo_screenwidth()
@@ -345,26 +334,22 @@ def viewmhs():
     x = (screen_width/2) - (width/2)
     y = (screen_height/2) - (height/2)
     mhswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
-    mhswin.resizable(0,0)
-
-    frame_header = Frame(mhswin, width=200,pady=5) 
+    mhswin.resizable(0, 0)
+    frame_header = Frame(mhswin, width=200, pady=5) 
     frame_header.pack(side=TOP, anchor=CENTER)
-
     label_cari = Label(frame_header, text='Cari Kelas: ')
     label_cari.pack(side=LEFT)
-    pilih_kelas = ttk.Combobox(frame_header, width =20,state="readonly",height=10)
+    pilih_kelas = ttk.Combobox(frame_header, width =20, state="readonly", height=10)
     pilih_kelas.pack(side=LEFT)
-
     pilih_kelas['values']=('')
     try:
-        with open('Mahasiswa\daftarkelas.csv', newline='') as f:
+        with open('Mahasiswa/daftarkelas.csv', newline='') as f:
             data = list(csv.reader(f))
             new_data = [a for i, a in enumerate(data) if a not in data[:i]]
-            with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as t:
+            with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as t:
                 write = csv.writer(t)
                 write.writerows(new_data)
-
-        with open('Mahasiswa\daftarkelas.csv', newline='') as csvfile:
+        with open('Mahasiswa/daftarkelas.csv', newline='') as csvfile:
             spamreader = csv.reader(csvfile , delimiter='"') 
             sortedlist = sorted(spamreader, key=operator.itemgetter(0))
             Tup1 = ()
@@ -374,13 +359,9 @@ def viewmhs():
                 Lst1 = list(Tup1)
                 Lst1.append(','.join(row))
                 Tup1 = tuple(Lst1)
-
-        pilih_kelas['values']=(Tup1)
-        
-    except(FileNotFoundError):
+        pilih_kelas['values']=(Tup1)    
+    except FileNotFoundError:
         pilih_kelas['values']=('')
-        
-    
     def buka_kelas():
         tree.delete(*tree.get_children())
         kelas_pilihan = pilih_kelas.get()
@@ -391,14 +372,10 @@ def viewmhs():
                     NPM = row['NPM']
                     Nama = row['Nama']
                     tree.insert("", 0, values=(NPM, Nama))
-        except(FileNotFoundError):
+        except FileNotFoundError:
             pass
-
-
-    button_cari = Button(frame_header,text='Buka',command=buka_kelas)
+    button_cari = Button(frame_header, text='Buka', command=buka_kelas)
     button_cari.pack(side=LEFT)
-
-
     TableMargin = Frame(mhswin, width=200)
     TableMargin.pack(side=TOP)
     scrollbarx = Scrollbar(TableMargin, orient=HORIZONTAL)
@@ -413,15 +390,11 @@ def viewmhs():
     tree.column('#0', stretch=NO, minwidth=0, width=0)
     tree.column('#1', stretch=NO, minwidth=0, width=190)
     tree.column('#2', stretch=NO, minwidth=0, width=190)
-
     tree.pack()
-    
-
 def viewabs():
     abswin = Toplevel(window)
     abswin.iconbitmap("ikon.ico")
     abswin.title("Daftar Absensi")
-    
     width = 500
     height = 400
     screen_width = abswin.winfo_screenwidth()
@@ -429,17 +402,16 @@ def viewabs():
     x = (screen_width/2) - (width/2)
     y = (screen_height/2) - (height/2)
     abswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
-    abswin.resizable(0,0)
-
-    tampil_path = Label(abswin,text='')
+    abswin.resizable(0, 0)
+    tampil_path = Label(abswin, text='')
     tampil_path.pack(side=TOP, anchor=CENTER)
     
 
     datacsv = StringVar()
     def buka_file():
-        ftypes = [('File CSV (.csv)',"*.csv")]
+        ftypes = [('File CSV (.csv)', "*.csv")]
         ttl  = "Buka File"
-        dir1 = 'C:\\Users\\'
+        dir1 = 'C:/Users/'
         file_absen = fd.askopenfilename(filetypes = ftypes, initialdir = dir1, title = ttl)
         datacsv.set(file_absen)
         abswin.focus_set()
@@ -458,17 +430,33 @@ def viewabs():
                     Waktu = row['Waktu']
                     tree.insert("", 0, values=(NPM, Nama, Tanggal, Waktu))
         except(FileNotFoundError):
-            tampil_path.configure(text='Tidak Ada File yang Ditampilkan',fg='red')               
+            #tampil_path.configure(text='Tidak Ada File yang Ditampilkan', fg='red')      
+            show_csv()
 
+    def show_csv():
+        daftar_file = glob.glob(pathabsensi+'/*.csv') #menyaring file di path
+        try:   
+            file_terbaru = max(daftar_file, key=os.path.getctime) #ambil file terbaru dari folder
+            tampil_path.configure(text='Menampilkan entry absensi terbaru di folder '+pathabsensi, fg='green')
+            with open(file_terbaru) as f:
+                reader = csv.DictReader(f, delimiter=',')
+                for row in reader:
+                    NPM = row['NPM']
+                    Nama = row['Nama']
+                    Tanggal = row['Tanggal']
+                    Waktu = row['Waktu']
+                    tree.insert("", 0, values=(NPM, Nama, Tanggal, Waktu))
+        except(ValueError):
+            tampil_path.configure(text='Tidak Ada File yang Ditampilkan', fg='red')
 
-    bukafile = Button(abswin,text='Buka File Absensi',command=buka_file)
+    bukafile = Button(abswin, text='Buka File Absensi', command=buka_file)
     bukafile.pack(side=TOP, anchor=W)
 
     TableMargin = Frame(abswin, width=200)
     TableMargin.pack(side=TOP)
     scrollbarx = Scrollbar(TableMargin, orient=HORIZONTAL)
     scrollbary = Scrollbar(TableMargin, orient=VERTICAL)
-    tree = ttk.Treeview(TableMargin, columns=("NPM", "Nama","Tanggal","Waktu"), height=200, selectmode="extended", yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
+    tree = ttk.Treeview(TableMargin, columns=("NPM", "Nama", "Tanggal", "Waktu"), height=200, selectmode="extended", yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
     scrollbary.config(command=tree.yview)
     scrollbary.pack(side=RIGHT, fill=Y)
     scrollbarx.config(command=tree.xview)
@@ -484,23 +472,6 @@ def viewabs():
     tree.column('#4', stretch=NO, minwidth=0, width=100)
 
     tree.pack()
-    
-    def show_csv():
-        daftar_file = glob.glob(pathabsensi+'\*.csv') #menyaring file di path
-        try:    
-            file_terbaru = max(daftar_file, key=os.path.getctime) #ambil file terbaru dari folder
-            tampil_path.configure(text='Menampilkan entry absensi terbaru di folder '+pathabsensi, fg='green')
-            with open(file_terbaru) as f:
-                reader = csv.DictReader(f, delimiter=',')
-                for row in reader:
-                    NPM = row['NPM']
-                    Nama = row['Nama']
-                    Tanggal = row['Tanggal']
-                    Waktu = row['Waktu']
-                    tree.insert("", 0, values=(NPM, Nama, Tanggal, Waktu))
-        except(ValueError):
-            tampil_path.configure(text='Tidak Ada File yang Ditampilkan',fg='red')
-
 
     if not uye.get():
         pathabsensi='Absensi'
@@ -542,9 +513,26 @@ def angka_numerik(s):
  
     return False
 
+def cek_duplikat_NPM(npm,kelas):
+    try:
+        with open ('Mahasiswa/'+kelas+'/DescMahasiswa.csv', 'r') as f:
+            reader = csv.reader(f)
+            list_kelas = list(reader)
+        list_kelas = [i[0] for i in list_kelas]
+
+        if npm in list_kelas:
+            return True
+        else:
+            return False
+    
+    except(FileNotFoundError):
+        return False
+
+    
+
 nama_folder_kelas = StringVar()
 def ambilgambar_intro():
-    global path_folder_kelas
+    global nama_folder_kelas
     nama_folder= (combokelas.get())
     path_kelas = 'Mahasiswa/'+nama_folder
     nama_folder_kelas.set(nama_folder)
@@ -557,9 +545,11 @@ def ambilgambar_intro():
 def ambilgambar(path):   
     NPM=(entry1.get())
     Nama=(entry2.get())
+    kelas = nama_folder_kelas.get()
+    
     if(angka_numerik(NPM) and (any(x.isalpha() for x in Nama) 
     and any(x.isspace() for x in Nama) 
-    or all(x.isalpha() or x.isspace() for x in Nama))):
+    or all(x.isalpha() or x.isspace() for x in Nama)) and cek_duplikat_NPM(NPM,kelas) == False):
         mb.showinfo("Ambil Gambar","Pastikan Wajah yang tertangkap di kamera hanya wajah anda\ndan terdapat cukup sinar untuk kamera mendeteksi muka\nTekan Q untuk keluar dari kamera")   
         cam = cv2.VideoCapture(0)
         harcascadePath = "haarcascade_frontalface_default.xml"
@@ -612,17 +602,22 @@ def ambilgambar(path):
                 writer.writerow(row)
             csvFile.close()
         #message1.configure(text= res,fg='green')
-        infogambar = mb.showinfo("Data Disimpan",res)
-    else:
-        if(angka_numerik(NPM)):
-            res = "Nama harus berisi huruf abjad"
-            message1.configure(text= res,fg='red')
-        if (any(x.isalpha() for x in Nama) and any(x.isspace() for x in Nama) or all(x.isalpha() or x.isspace() for x in Nama)):
-            res = "NPM harus berisi angka"
-            message1.configure(text= res,fg='red')
-        if(len(NPM) <=0 or len(Nama)<=0):
-            res = "Kedua form harus dilengkapi"
-            message1.configure(text= res,fg='red')
+        mb.showinfo("Data Disimpan",res)
+
+    elif not (angka_numerik(NPM)):
+        res = "NPM harus berisi angka"
+        message1.configure(text= res,fg='red')
+    elif not (any(x.isalpha() for x in Nama) and any(x.isspace() for x in Nama) or all(x.isalpha() or x.isspace() for x in Nama)):
+        res = "Nama harus berisi huruf abjad"
+        message1.configure(text= res,fg='red')
+    elif cek_duplikat_NPM(NPM,kelas):
+        res = "NPM sudah ada didalam database"
+        message1.configure(text= res,fg='red')
+    elif(len(NPM) <=0 or len(Nama)<=0 or kelas == ''):
+        res = "Ketiga form harus dilengkapi"
+        message1.configure(text= res,fg='red')
+
+
 
 def getgambardanlabel(path):
     #ambil path dari file di folder
@@ -668,14 +663,14 @@ def train_intro():
 
     kombo_kelas['values']=('')
     try:
-        with open('Mahasiswa\daftarkelas.csv', newline='') as f:
+        with open('Mahasiswa/daftarkelas.csv', newline='') as f:
             data = list(csv.reader(f))
             new_data = [a for i, a in enumerate(data) if a not in data[:i]]
-            with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as t:
+            with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as t:
                 write = csv.writer(t)
                 write.writerows(new_data)
 
-        with open('Mahasiswa\daftarkelas.csv', newline='') as csvfile:
+        with open('Mahasiswa/daftarkelas.csv', newline='') as csvfile:
             spamreader = csv.reader(csvfile , delimiter='"') 
             sortedlist = sorted(spamreader, key=operator.itemgetter(0))
             Tup1 = ()
@@ -704,7 +699,6 @@ def train_intro():
     button_cari = Button(intro_train,text='Proses',font=('helvetica', 13, 'bold'),command=button_train)
     button_cari.pack(side=TOP, anchor = CENTER)
     
-    return intro_train
 
 def traingambar(path):
     try:
@@ -712,8 +706,6 @@ def traingambar(path):
         #recognizer = face.createLBPHFaceRecognizer()
         recognizer = cv2.face.LBPHFaceRecognizer_create() 
         #$cv2.createLBPHFaceRecognizer()
-        harcascadePath = "haarcascade_frontalface_default.xml"
-        detector =cv2.CascadeClassifier(harcascadePath)
         mukamuka,nomormhs = getgambardanlabel('Mahasiswa/'+path+'/gambartraining')
         recognizer.train(mukamuka, np.array(nomormhs))
         if not os.path.exists('Mahasiswa/'+path+'/hasiltraining/'):
@@ -721,7 +713,7 @@ def traingambar(path):
         recognizer.save('Mahasiswa/'+path+'/hasiltraining/Trainer.yml')
         #+",".join(str(f) for f in Id)
         #message1.configure(text= res,fg='green')
-        trainsukses = mb.showinfo("Proses Selesai","Proses training data selesai")
+        mb.showinfo("Proses Selesai","Proses training data selesai")
     except :
         #message1.configure(text="Tidak ada file untuk diproses",fg='red')
         mb.showerror("No File Found","Tidak ada data gambar dan mahasiswa yang dapat diproses")
@@ -750,14 +742,14 @@ def kenali_intro():
 
     kombo_kelas['values']=('')
     try:
-        with open('Mahasiswa\daftarkelas.csv', newline='') as f:
+        with open('Mahasiswa/daftarkelas.csv', newline='') as f:
             data = list(csv.reader(f))
             new_data = [a for i, a in enumerate(data) if a not in data[:i]]
-            with open('Mahasiswa\daftarkelas.csv', 'w', newline='') as t:
+            with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as t:
                 write = csv.writer(t)
                 write.writerows(new_data)
 
-        with open('Mahasiswa\daftarkelas.csv', newline='') as csvfile:
+        with open('Mahasiswa/daftarkelas.csv', newline='') as csvfile:
             spamreader = csv.reader(csvfile , delimiter='"') 
             sortedlist = sorted(spamreader, key=operator.itemgetter(0))
             Tup1 = ()
@@ -781,24 +773,21 @@ def kenali_intro():
             intro_recog.focus_set()
         else:
             if not path_penyimpanan:
-                gkadafolder = mb.showinfo("Tidak ada direktori penyimpanan", "Direktori penyimpanan file absensi belum ditentukan.\n File absensi akan disimpan di direktori aplikasi")
-                kenaliwajah(nama_kelas_recog, penyimpanan='Absensi')
+                path_penyimpanan = 'Absensi'
+                mb.showinfo("Tidak ada direktori penyimpanan", "Direktori penyimpanan file absensi belum ditentukan.\n File absensi akan disimpan di direktori aplikasi")
+                kenaliwajah(nama_kelas_recog, penyimpanan=path_penyimpanan)
             else:
-                kenaliwajah(nama_kelas_recog,penyimpanan = path_penyimpanan)
+                kenaliwajah(nama_kelas_recog,penyimpanan=path_penyimpanan)
             
     button_cari = Button(intro_recog,text='Mulai',font=('helvetica', 13, 'bold'),command=button_recog)
     button_cari.pack(side=TOP, anchor = CENTER)
-
-
-    
-
 
 def kenaliwajah(kelas, penyimpanan):
     try:
         recognizer = cv2.face.LBPHFaceRecognizer_create()#cv2.createLBPHFaceRecognizer()
         recognizer.read('Mahasiswa/'+kelas+'/hasiltraining/Trainer.yml')
         harcascadePath = "haarcascade_frontalface_default.xml"
-        faceCascade = cv2.CascadeClassifier(harcascadePath);    
+        faceCascade = cv2.CascadeClassifier(harcascadePath)    
         df=pd.read_csv('Mahasiswa/'+kelas+'/DescMahasiswa.csv')
         df.reset_index(drop=True)
         cam = cv2.VideoCapture(0)
@@ -819,7 +808,8 @@ def kenaliwajah(kelas, penyimpanan):
                     date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
                     timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
                     aa=df.loc[df['NPM'] == nomormhs]['Nama'].values
-                    tt=aa+"_"+str(nomormhs)
+                    aa=(str(aa).lstrip("['").rstrip("']"))#hapus bracket dan tanda petik
+                    tt=aa#+"_"+str(nomormhs)
                     
                     absensi.loc[len(absensi)] = [nomormhs,aa,date,timeStamp]
                     
@@ -830,7 +820,7 @@ def kenaliwajah(kelas, penyimpanan):
 
                 if(conf > 75):
                     nomorFile=len(os.listdir("Takdikenal"))+1
-                    cv2.imwrite("Takdikenal\Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w])            
+                    cv2.imwrite("Takdikenal/Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w])            
                 cv2.putText(im,str(tt),(x,y+h), font, 1,(255,255,255),2)
             
             width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
@@ -841,6 +831,7 @@ def kenaliwajah(kelas, penyimpanan):
 
             cv2.putText(im,'Tekan Q untuk keluar',(teksx,teksy), font, 1,(255,255,255),2,cv2.LINE_AA)        
             absensi=absensi.drop_duplicates(subset=['NPM'],keep='first')  #biar input absen nggak sama semua timestampnya (hilangin duplikat)   
+            #im = cv2.resize(im, (1280,720))
             cv2.imshow('Kenali Wajah',im) 
             if (cv2.waitKey(1)==ord('q')):
                 break
@@ -852,13 +843,13 @@ def kenaliwajah(kelas, penyimpanan):
         #pathabsensi = uye.get()
         fileName=penyimpanan+"/"+kelas+"_Absensi_"+date+"_"+Hour+"-"+Minute+"-"+Second+".csv"
         #absensi['Nama'] = absensi['Nama'].str.strip('[]')
-        absensi['Nama'] = absensi['Nama'].str.join(', ')
+        #absensi['Nama'] = absensi['Nama'].str.join(', ')
         absensi.to_csv(fileName,index=False)
         cam.release()
         cv2.destroyAllWindows()
         #print(absensi)
         #message1.configure(text='Data Absensi Telah Disimpan',fg='green')
-        infokenal = mb.showinfo("Data Absensi Disimpan","Data Absensi telah disimpan di direktori yang telah ditentukan")
+        mb.showinfo("Data Absensi Disimpan","Data Absensi telah disimpan di direktori yang telah ditentukan")
     except cv2.error:
         mb.showerror("No File Found","Tidak ada data file yang dapat diproses")
 
