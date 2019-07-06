@@ -1,3 +1,5 @@
+#coding:cp1252
+
 from tkinter import * #tkinter untuk GUI
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
@@ -47,14 +49,7 @@ lbl3 = Label(window, text="Kelas", font=('helvetica', 15))
 combokelas = ttk.Combobox(window, width=20, state="readonly", font=('helvetica', 15))
 message1 = Label(window, text="", font=('helvetica', 15))
 
-lbl.place(x=50, y=175)
-lbl2.place(x=50, y=205)
-lbl3.place(x=50, y=235)
-entry1.place(x=194, y=175)
-entry2.place(x=194, y=205)
-combokelas.place(x=194, y=235)
 
-message1.place(x=250, y=280, anchor='center')
 
 
 def read_kelas():
@@ -103,21 +98,27 @@ def set_kelas():
     kelaswin.title("Kelas")
     kelaswin.iconbitmap("ikon.ico")
     width = 330
-    height = 90
+    height = 170
     screen_width = kelaswin.winfo_screenwidth()
     screen_height = kelaswin.winfo_screenheight()
     x = (screen_width/2) - (width/2)
     y = (screen_height/2) - (height/2)
     kelaswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
     kelaswin.resizable(0, 0)   
-    frame1 = Frame(kelaswin)
-    frame2 = Frame(frame1)
-    frame1.pack(side=TOP, anchor=CENTER, pady=5)
-    labelkelas = Label(frame1, text="Nama Kelas (Gunakan koma untuk jamak):", font=('helvetica', 9))
-    labelkelas.pack(side=TOP, anchor=W)
-    frame2.pack(side=TOP, anchor=CENTER)
-    entrykelas = Entry(frame2,width=30, font=('helvetica', 10))
-    entrykelas.pack(side=LEFT, anchor=W)
+
+    tab_parent = ttk.Notebook(kelaswin)
+    frame1 = ttk.Frame(tab_parent)
+    frame2 = ttk.Frame(tab_parent)
+    tab_parent.add(frame1, text="Tambah Kelas")
+    tab_parent.add(frame2, text="Hapus Kelas")
+    tab_parent.pack(expand=1, fill='both')
+
+    framex = Frame(frame1)
+    framex.pack(side=TOP,anchor=CENTER, pady=30)
+    labelkelas = Label(framex, text="Nama Kelas (gunakan koma jika lebih dari satu) :", font=('helvetica', 10))
+    labelkelas.pack(side=TOP, anchor=CENTER)
+    entrykelas = Entry(framex,width=40, font=('helvetica', 10))
+    entrykelas.pack(side=TOP, anchor=CENTER,pady=5)
 
     
     def input_nama_kelas():
@@ -135,78 +136,65 @@ def set_kelas():
                 #writer.writerow(','.join(Tup1))
                 writer.writerow(result)  
                 csvfile.close()
+                readdelete()
                 read_kelas()
                 mb.showinfo("Input Kelas", "Nama kelas berhasil dimasukkan") 
                 kelaswin.focus_set() 
         
     
 
-    def hapus_kelas():
-        hapuskelaswin = Toplevel(window)
-        hapuskelaswin.title("Hapus Kelas")
-        hapuskelaswin.iconbitmap("ikon.ico")
-        hapuskelaswin.grab_set()
 
-        width = 250
-        height = 145
-        screen_width = hapuskelaswin.winfo_screenwidth()
-        screen_height = hapuskelaswin.winfo_screenheight()
-        x = (screen_width/2) - (width/2)
-        y = (screen_height/2) - (height/2)
-        hapuskelaswin.geometry("%dx%d+%d+%d" % (width, height, x, y))
-        hapuskelaswin.resizable(0, 0)
-        
+    framea = Frame(frame2)
+    frameb = Frame(frame2)
+    framea.pack(side=TOP, pady=5)
+    frameb.pack(side=TOP, pady=5)
+    
 
-        #sizea = (65/100)*height
-        #sizeb = height-sizea
+    labeldelete = Label(framea, text='Cari Entry Kelas')
+    labeldelete.pack(anchor=CENTER)
 
-        framea = Frame(hapuskelaswin)
-        frameb = Frame(hapuskelaswin)
-        framea.pack(side=TOP, pady=5)
-        frameb.pack(side=TOP, pady=5)
-        
+    combodelete = ttk.Combobox(framea, state="readonly")
+    combodelete.pack(side=TOP)
 
-        labeldelete = Label(framea, text='Cari Entry Kelas')
-        labeldelete.pack(anchor=CENTER)
+    checkvar = IntVar()
+    checkdelete = ttk.Checkbutton(framea, text='Hapus beserta folder kelas', variable=checkvar)
+    checkdelete.pack(side=TOP)
 
-        combodelete = ttk.Combobox(framea, state="readonly")
-        combodelete.pack(side=TOP)
+    def readdelete():
+        combodelete.set('')
+        combodelete['values']=('')
+        try:
+            with open('Mahasiswa/daftarkelas.csv', newline='') as f:
+                data = list(csv.reader(f))
+                new_data = [a for i, a in enumerate(data) if a not in data[:i]]
+                with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as t:
+                    write = csv.writer(t)
+                    write.writerows(new_data)
 
-        checkvar = IntVar()
-        checkdelete = ttk.Checkbutton(framea, text='Hapus beserta folder kelas', variable=checkvar)
-        checkdelete.pack(side=TOP)
+            with open('Mahasiswa/daftarkelas.csv', newline='') as csvfile:
+                spamreader = csv.reader(csvfile, delimiter='"') 
+                sortedlist = sorted(spamreader, key=operator.itemgetter(0))
+                Tup1 = ()
+                Lst1 = ()
+                for row in sortedlist:
+                    #print(','.join(row))
+                    Lst1 = list(Tup1)
+                    Lst1.append(','.join(row))
+                    Tup1 = tuple(Lst1)
 
-        def readdelete():
-            combodelete.set('')
+            combodelete['values']=(Tup1)
+            
+        except FileNotFoundError:
             combodelete['values']=('')
-            try:
-                with open('Mahasiswa/daftarkelas.csv', newline='') as f:
-                    data = list(csv.reader(f))
-                    new_data = [a for i, a in enumerate(data) if a not in data[:i]]
-                    with open('Mahasiswa/daftarkelas.csv', 'w', newline='') as t:
-                        write = csv.writer(t)
-                        write.writerows(new_data)
 
-                with open('Mahasiswa/daftarkelas.csv', newline='') as csvfile:
-                    spamreader = csv.reader(csvfile, delimiter='"') 
-                    sortedlist = sorted(spamreader, key=operator.itemgetter(0))
-                    Tup1 = ()
-                    Lst1 = ()
-                    for row in sortedlist:
-                        #print(','.join(row))
-                        Lst1 = list(Tup1)
-                        Lst1.append(','.join(row))
-                        Tup1 = tuple(Lst1)
+    readdelete()
 
-                combodelete['values']=(Tup1)
-                
-            except FileNotFoundError:
-                combodelete['values']=('')
-
-        readdelete()
-
-        def hapus_satuan_kelas():
-            kelashapus = combodelete.get()
+    def hapus_satuan_kelas():
+        kelashapus = combodelete.get()
+        if kelashapus == '':
+            mb.showerror('Tidak ada Kelas', 'Tidak ada kelas yang terpilih')
+            kelaswin.focus_set() 
+        elif not kelashapus == '': 
             if checkvar.get() == 0:
                 tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus kelas '+kelashapus+'?', icon='warning')
                 if tanyahapus == 'yes':
@@ -226,9 +214,9 @@ def set_kelas():
                             readdelete()
                         except IndexError:
                             pass
-                        hapuskelaswin.focus_set() 
+                        kelaswin.focus_set() 
                 elif tanyahapus == 'no':
-                    hapuskelaswin.focus_set() 
+                    kelaswin.focus_set() 
 
             elif checkvar.get() == 1:
                 tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus kelas '+kelashapus+' beserta direktorinya?', icon='warning')
@@ -253,53 +241,53 @@ def set_kelas():
                             readdelete()
                         except IndexError:
                             pass
-                        hapuskelaswin.focus_set() 
+                        kelaswin.focus_set() 
                 elif tanyahapus == 'no':
-                    hapuskelaswin.focus_set() 
+                    kelaswin.focus_set() 
 
 
 
-        def hapus_daftar_kelas():
-            if checkvar.get() == 0:
-                tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus semua kelas?', icon ='warning')
-                if tanyahapus == 'yes':
-                    try:
-                        os.remove("Mahasiswa/daftarkelas.csv")
-                    except FileNotFoundError:
-                        pass
-                    combokelas.set('')
-                    hapuskelaswin.focus_set()
-                    readdelete()
-                    read_kelas()
-                elif tanyahapus == 'no':
-                    hapuskelaswin.focus_set()
+    def hapus_daftar_kelas():
+        if checkvar.get() == 0:
+            tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus semua kelas?', icon ='warning')
+            if tanyahapus == 'yes':
+                try:
+                    os.remove("Mahasiswa/daftarkelas.csv")
+                except FileNotFoundError:
+                    pass
+                combokelas.set('')
+                kelaswin.focus_set()
+                readdelete()
+                read_kelas()
+            elif tanyahapus == 'no':
+                kelaswin.focus_set()
 
-            elif checkvar.get() == 1:
-                tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus semua kelas dan direktorinya?', icon='warning')
-                if tanyahapus == 'yes':
-                    try:
-                        shutil.rmtree("Mahasiswa/")
-                        os.mkdir('Mahasiswa')
-                    except FileNotFoundError:
-                        pass
-                    except PermissionError:
-                        os.mkdir('Mahasiswa/')
-                    combokelas.set('')
-                    hapuskelaswin.focus_set()
-                    readdelete()
-                    read_kelas()
-                elif tanyahapus == 'no':
-                    hapuskelaswin.focus_set()
-        buttonhapus = Button(frameb, text= 'Hapus', width= 10, command = hapus_satuan_kelas)
-        buttonhapus.pack(side=LEFT, anchor = CENTER, padx=5)
-        buttonhapusALL = Button(hapuskelaswin, text= 'Hapus Semua Kelas', width= 20, command = hapus_daftar_kelas)
-        buttonhapusALL.pack(side=TOP, anchor = CENTER, padx=5)       
-    buttonkelas = Button(frame2, text="Tambah", font=('helvetica', 9), width = 10, command=input_nama_kelas)
+        elif checkvar.get() == 1:
+            tanyahapus = mb.askquestion('Hapus?', 'Anda yakin ingin menghapus semua kelas dan direktorinya?', icon='warning')
+            if tanyahapus == 'yes':
+                try:
+                    shutil.rmtree("Mahasiswa/")
+                    os.mkdir('Mahasiswa')
+                except PermissionError:
+                    os.mkdir('Mahasiswa/')
+                except FileNotFoundError:
+                    pass
+                combokelas.set('')
+                kelaswin.focus_set()
+                readdelete()
+                read_kelas()
+            elif tanyahapus == 'no':
+                kelaswin.focus_set()
+    buttonhapus = Button(frameb, text= 'Hapus', width= 10, command = hapus_satuan_kelas)
+    buttonhapus.pack(side=LEFT, anchor = CENTER, padx=5)
+    buttonhapusALL = Button(frame2, text= 'Hapus Semua Kelas', width= 20, command = hapus_daftar_kelas)
+    buttonhapusALL.pack(side=TOP, anchor = CENTER, padx=5)       
+    buttonkelas = Button(framex, text="Tambah", font=('helvetica', 9), width = 10, command=input_nama_kelas)
     #buttonhapuskelasALL = Button(frame2, text="Hapus Daftar Kelas", font=('helvetica', 9),command=hapus_daftar_kelas)
-    buttonhapuskelas = Button(frame1, text="Hapus Kelas", width=15, command=hapus_kelas)
-    buttonkelas.pack(side= LEFT, padx=5)
+    #buttonhapuskelas = Button(frame1, text="Hapus Kelas", width=15, command=hapus_kelas)
+    buttonkelas.pack(side= TOP, padx=10)
     #buttonhapuskelasALL.pack(side=LEFT, anchor=W)
-    buttonhapuskelas.pack(side=TOP, anchor=W, pady=5)
+    #buttonhapuskelas.pack(side=TOP, anchor=W, pady=5)
 def keluar():
     tanya_keluar = mb.askquestion('Keluar', 'Anda yakin ingin keluar aplikasi?', icon='warning')
     if tanya_keluar == 'yes':
@@ -483,11 +471,50 @@ def viewabs():
 def tentang():
     mb.showinfo('Absensi Facial Recognition', 'Dibuat oleh Christian Daomara\nSebagai syarat melengkapi Penulisan Ilmiah')
 
+global portnum
+portnum = IntVar()
+def set_port():
+    setportwin = Toplevel(window)
+    setportwin.iconbitmap("ikon.ico")
+    setportwin.title("Port USB")
+    width = 200
+    height = 60
+    screen_width = setportwin.winfo_screenwidth()
+    screen_height = setportwin.winfo_screenheight()
+    x = (screen_width/2) - (width/2)
+    y = (screen_height/2) - (height/2)
+    setportwin.geometry("%dx%d+%d+%d" % (width, height, x, y))
+    setportwin.resizable(0, 0)
+
+    lbl_port= Label(setportwin,text='Set Index Port USB:')
+    lbl_port.pack(side=TOP,anchor=CENTER,pady=1)
+    frame1 = Frame(setportwin)
+    frame1.pack(side=TOP,anchor=CENTER)
+    entry_nmr = Entry(frame1, width=10)
+    entry_nmr.pack(side=LEFT)
+
+    def btn_nmr_get():
+        if angka_numerik(entry_nmr.get()):
+            if not entry_nmr.get():
+                portnum.set(0)
+            else:
+                portnum.set(entry_nmr.get())
+                mb.showinfo('Info','Input Nomor Port Berhasil Dimasukkan')
+                setportwin.focus_set()
+        else:
+            mb.showerror('Error Input','Input Harus menggunakan angka')
+            setportwin.focus_set()
+
+    btn_nmr = Button(frame1, text = 'Set',width=5, command=btn_nmr_get)
+    btn_nmr.pack(side=LEFT,padx=3)
+   
 
 dropdown_view.add_command(label='Absensi', command=viewabs)
 dropdown_view.add_command(label='Mahasiswa', command=viewmhs)
 dropdown_file.add_command(label='Set Folder Absensi...',command=pathabsensi)
 dropdown_file.add_command(label='Kelas...',command=set_kelas)
+dropdown_file.add_separator()
+dropdown_file.add_command(label='Port Kamera USB...',command = set_port)
 dropdown_file.add_separator()
 dropdown_file.add_command(label='Keluar',command=keluar)
 dropdown_help.add_command(label='Penggunaan',command=penggunaan)
@@ -496,6 +523,8 @@ dropdown_help.add_command(label='Tentang', command=tentang)
 
 
 #-------------End Dropdown Menu-------------
+
+
 
 def angka_numerik(s):
     try:
@@ -543,79 +572,81 @@ def ambilgambar_intro():
         ambilgambar(path_kelas)
 
 def ambilgambar(path):   
-    NPM=(entry1.get())
-    Nama=(entry2.get())
-    kelas = nama_folder_kelas.get()
-    
-    if(angka_numerik(NPM) and (any(x.isalpha() for x in Nama) 
-    and any(x.isspace() for x in Nama) 
-    or all(x.isalpha() or x.isspace() for x in Nama)) and cek_duplikat_NPM(NPM,kelas) == False):
-        mb.showinfo("Ambil Gambar","Pastikan Wajah yang tertangkap di kamera hanya wajah anda\ndan terdapat cukup sinar untuk kamera mendeteksi muka\nTekan Q untuk keluar dari kamera")   
-        cam = cv2.VideoCapture(0)
-        harcascadePath = "haarcascade_frontalface_default.xml"
-        detector = cv2.CascadeClassifier(cv2.data.haarcascades + harcascadePath)
-        nomorSample=0
-        width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
-        height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT) # float
-
-        teksx = int(width / 2) - int(width/4)
-        teksy = int((95/100)* height)
-        while(True):
-            ret, img = cam.read()
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            font = cv2.FONT_HERSHEY_SIMPLEX 
-            muka = detector.detectMultiScale(gray, 1.3, 5)
-            for (x,y,w,h) in muka:
-                cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-                cv2.putText(img,'Tunggu Beberapa Detik',(teksx,teksy), font, 1,(255,255,255),2,cv2.LINE_AA)        
-                #increment nomor sample biar bisa dibedakan 
-                nomorSample=nomorSample+1
-                #ssimpan gambar yang ditangkap ke folder GambarTraining
-                if not os.path.exists(path+"/GambarTraining/"):
-                    os.mkdir(path+"/GambarTraining/")
-                cv2.imwrite(path+"/GambarTraining/"+Nama +"."+NPM +'.'+ str(nomorSample) + ".jpg", gray[y:y+h,x:x+w])
-                #display frame windows
-                cv2.imshow('Deteksi Wajah',img)
-            #tunggu 100 milisecond 
-            if cv2.waitKey(100) & 0xFF == ord('q'):
-                break
-            # break kalo sample udah sampai 50
-            elif nomorSample>=100:
-                break
-        cam.release()
-        cv2.destroyAllWindows() 
-        res = "Data dengan NPM: " + NPM +" dan Nama: "+ Nama +" disimpan"
-        row = [NPM, Nama]
+    try:
+        NPM=(entry1.get())
+        Nama=(entry2.get())
+        kelas = nama_folder_kelas.get()
         
-        if not os.path.isfile(path+'/DescMahasiswa.csv'):
-            with open(path+'/DescMahasiswa.csv', mode='w', newline='') as file_output:
-                file_csv = csv.writer(file_output)
-                file_csv.writerow(['NPM', 'Nama'])
-            file_output.close()
-            with open(path+'/DescMahasiswa.csv',mode='a+', newline='') as csvFile:
-                writer = csv.writer(csvFile)
-                writer.writerow(row)
-            csvFile.close()
-        else:
-            with open(path+'/DescMahasiswa.csv',mode='a+', newline='') as csvFile:
-                writer = csv.writer(csvFile)
-                writer.writerow(row)
-            csvFile.close()
-        #message1.configure(text= res,fg='green')
-        mb.showinfo("Data Disimpan",res)
+        if(angka_numerik(NPM) and (any(x.isalpha() for x in Nama) 
+        and any(x.isspace() for x in Nama) 
+        or all(x.isalpha() or x.isspace() for x in Nama)) and not kelas == '' and cek_duplikat_NPM(NPM,kelas) == False):
+            mb.showinfo("Ambil Gambar","Pastikan Wajah yang tertangkap di kamera hanya wajah anda\ndan terdapat cukup sinar untuk kamera mendeteksi muka\nTekan Q untuk keluar dari kamera")   
+            cam = cv2.VideoCapture(portnum.get())
+            detector = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+            nomorSample=0
+            width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
+            height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT) # float
 
-    elif not (angka_numerik(NPM)):
-        res = "NPM harus berisi angka"
-        message1.configure(text= res,fg='red')
-    elif not (any(x.isalpha() for x in Nama) and any(x.isspace() for x in Nama) or all(x.isalpha() or x.isspace() for x in Nama)):
-        res = "Nama harus berisi huruf abjad"
-        message1.configure(text= res,fg='red')
-    elif cek_duplikat_NPM(NPM,kelas):
-        res = "NPM sudah ada didalam database"
-        message1.configure(text= res,fg='red')
-    elif(len(NPM) <=0 or len(Nama)<=0 or kelas == ''):
-        res = "Ketiga form harus dilengkapi"
-        message1.configure(text= res,fg='red')
+            teksx = int(width / 2) - int(width/4)
+            teksy = int((95/100)* height)
+            while(True):
+                ret, img = cam.read()
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                font = cv2.FONT_HERSHEY_SIMPLEX 
+                muka = detector.detectMultiScale(gray, 1.3, 5)
+                for (x,y,w,h) in muka:
+                    cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+                    cv2.putText(img,'Tunggu Beberapa Detik',(teksx,teksy), font, 1,(255,255,255),2,cv2.LINE_AA)        
+                    #increment nomor sample biar bisa dibedakan 
+                    nomorSample=nomorSample+1
+                    #ssimpan gambar yang ditangkap ke folder GambarTraining
+                    if not os.path.exists(path+"/GambarTraining/"):
+                        os.mkdir(path+"/GambarTraining/")
+                    cv2.imwrite(path+"/GambarTraining/"+Nama +"."+NPM +'.'+ str(nomorSample) + ".jpg", gray[y:y+h,x:x+w])
+                    #display frame windows
+                    cv2.imshow('Deteksi Wajah',img)
+                #tunggu 100 milisecond 
+                if cv2.waitKey(100) & 0xFF == ord('q'):
+                    break
+                # break kalo sample udah sampai 50
+                elif nomorSample>=100:
+                    break
+            cam.release()
+            cv2.destroyAllWindows() 
+            res = "Data dengan NPM: " + NPM +" dan Nama: "+ Nama +" disimpan"
+            row = [NPM, Nama]
+            
+            if not os.path.isfile(path+'/DescMahasiswa.csv'):
+                with open(path+'/DescMahasiswa.csv', mode='w', newline='') as file_output:
+                    file_csv = csv.writer(file_output)
+                    file_csv.writerow(['NPM', 'Nama'])
+                file_output.close()
+                with open(path+'/DescMahasiswa.csv',mode='a+', newline='') as csvFile:
+                    writer = csv.writer(csvFile)
+                    writer.writerow(row)
+                csvFile.close()
+            else:
+                with open(path+'/DescMahasiswa.csv',mode='a+', newline='') as csvFile:
+                    writer = csv.writer(csvFile)
+                    writer.writerow(row)
+                csvFile.close()
+            #message1.configure(text= res,fg='green')
+            mb.showinfo("Data Disimpan",res)
+
+        elif not (angka_numerik(NPM)):
+            res = "NPM harus berisi angka"
+            message1.configure(text= res,fg='red')
+        elif not (any(x.isalpha() for x in Nama) and any(x.isspace() for x in Nama) or all(x.isalpha() or x.isspace() for x in Nama)):
+            res = "Nama harus berisi huruf abjad"
+            message1.configure(text= res,fg='red')
+        elif cek_duplikat_NPM(NPM,kelas):
+            res = "NPM sudah ada didalam database"
+            message1.configure(text= res,fg='red')
+        elif(len(NPM) <=0 or len(Nama)<=0 or kelas == ''):
+            res = "Ketiga form harus dilengkapi"
+            message1.configure(text= res,fg='red')
+    except cv2.error as e:
+        mb.showerror("Error",e)
 
 
 
@@ -717,6 +748,19 @@ def traingambar(path):
     except :
         #message1.configure(text="Tidak ada file untuk diproses",fg='red')
         mb.showerror("No File Found","Tidak ada data gambar dan mahasiswa yang dapat diproses")
+    
+    path_penyimpanan = uye.get()
+    nama_kelas_recog = path
+    if not nama_kelas_recog:
+        mb.showerror('Tidak ada Input','Input kelas belum dimasukkan')
+        intro_recog.focus_set()
+    else:
+        if not path_penyimpanan:
+            path_penyimpanan = 'Absensi'
+            mb.showinfo("Tidak ada direktori penyimpanan", "Direktori penyimpanan file absensi belum ditentukan.\n File absensi akan disimpan di direktori aplikasi")
+            kenaliwajah(nama_kelas_recog, penyimpanan=path_penyimpanan)
+        else:
+            kenaliwajah(nama_kelas_recog,penyimpanan=path_penyimpanan)
 
 
 def kenali_intro():
@@ -786,11 +830,11 @@ def kenaliwajah(kelas, penyimpanan):
     try:
         recognizer = cv2.face.LBPHFaceRecognizer_create()#cv2.createLBPHFaceRecognizer()
         recognizer.read('Mahasiswa/'+kelas+'/hasiltraining/Trainer.yml')
-        harcascadePath = "haarcascade_frontalface_default.xml"
-        faceCascade = cv2.CascadeClassifier(harcascadePath)    
+        
+        faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')    
         df=pd.read_csv('Mahasiswa/'+kelas+'/DescMahasiswa.csv')
         df.reset_index(drop=True)
-        cam = cv2.VideoCapture(0)
+        cam = cv2.VideoCapture(portnum.get())
         font = cv2.FONT_HERSHEY_SIMPLEX        
         nama_kolom =  ['NPM','Nama','Tanggal','Waktu']
         absensi = pd.DataFrame(columns = nama_kolom)  
@@ -802,7 +846,7 @@ def kenaliwajah(kelas, penyimpanan):
             for(x,y,w,h) in mukamuka:
                 
                 nomormhs, conf = recognizer.predict(gray[y:y+h,x:x+w])                                   
-                if(conf < 50):
+                if(conf < 40):
                     cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
                     ts = time.time()      
                     date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
@@ -819,8 +863,15 @@ def kenaliwajah(kelas, penyimpanan):
                     tt=str(nomormhs)  
 
                 if(conf > 75):
-                    nomorFile=len(os.listdir("Takdikenal"))+1
-                    cv2.imwrite("Takdikenal/Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w])            
+                    try:
+                        nomorFile=len(os.listdir("Takdikenal"))+1
+                        cv2.imwrite("Takdikenal/Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w]) 
+                    except FileNotFoundError:
+                        os.mkdir('Takdikenal')
+                        nomorFile=len(os.listdir("Takdikenal"))+1
+                        cv2.imwrite("Takdikenal/Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w]) 
+                                   
+                   
                 cv2.putText(im,str(tt),(x,y+h), font, 1,(255,255,255),2)
             
             width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
@@ -844,21 +895,75 @@ def kenaliwajah(kelas, penyimpanan):
         fileName=penyimpanan+"/"+kelas+"_Absensi_"+date+"_"+Hour+"-"+Minute+"-"+Second+".csv"
         #absensi['Nama'] = absensi['Nama'].str.strip('[]')
         #absensi['Nama'] = absensi['Nama'].str.join(', ')
-        absensi.to_csv(fileName,index=False)
+        try:
+            absensi.to_csv(fileName,index=False)
+        except FileNotFoundError:
+            os.mkdir('Absensi')
+            absensi.to_csv(fileName,index=False)
         cam.release()
         cv2.destroyAllWindows()
         #print(absensi)
         #message1.configure(text='Data Absensi Telah Disimpan',fg='green')
         mb.showinfo("Data Absensi Disimpan","Data Absensi telah disimpan di direktori yang telah ditentukan")
-    except cv2.error:
-        mb.showerror("No File Found","Tidak ada data file yang dapat diproses")
+    except cv2.error as e:
+        mb.showerror("Error",e)
 
-button1 = Button(window, text="Deteksi Wajah", font=('helvetica', 13, 'bold'), command=ambilgambar_intro)
-button2 = Button(window, text="Proses Data", font=('helvetica', 13, 'bold'), command=train_intro)
-button3 = Button(window, text="Kenali Wajah", font=('helvetica', 13, 'bold'), command=kenali_intro)
-button1.place(x=50, y=300)
-button2.place(x=195, y=300)
-button3.place(x=325, y=300)
+button_rekam = Button(window, text="Mulai Rekam", font=('helvetica', 13, 'bold'), command=ambilgambar_intro)
+
+img_kenali = Image.open("Kenali-Wajah.jpg")
+#img_kenali = img_kenali.resize((150, 150))
+renderimg = ImageTk.PhotoImage(img_kenali)
+button_train = Button(window, image=renderimg, font=('helvetica', 13, 'bold'),bd=0, command=train_intro)
+button_train.image = renderimg
+button_train.place(x=270, y=180)
+
+
+
+def back():
+    lbl.place_forget()
+    lbl2.place_forget()
+    lbl3.place_forget()
+    entry1.place_forget()
+    entry2.place_forget()
+    combokelas.place_forget()
+    message1.place_forget()
+
+    button_switch.place(x=70, y=180)
+    button_train.place(x=270, y=180)
+    
+    
+    button_rekam.place_forget()
+    button_back.place_forget()
+
+def switch_rekam():
+    lbl.place(x=50, y=175)
+    lbl2.place(x=50, y=205)
+    lbl3.place(x=50, y=235)
+    entry1.place(x=194, y=175)
+    entry2.place(x=194, y=205)
+    combokelas.place(x=194, y=235)
+    message1.place(x=250, y=280, anchor='center')
+
+    button_switch.place_forget()
+    button_train.place_forget()
+    
+    
+    button_rekam.place(x=200, y=300)
+    button_back.place(x=10,y=10)
+    
+img_rekam = Image.open("Deteksi-Wajah.jpg")
+#img_rekam = img_rekam.resize((150, 150))
+renderimg = ImageTk.PhotoImage(img_rekam)
+button_switch = Button(window, image=renderimg, font=('helvetica', 13, 'bold'),bd=0, command=switch_rekam)
+button_switch.image = renderimg
+button_switch.place(x=70, y=180)
+
+img_back = Image.open("back-button.jpg")
+#img_back = img_back.resize((40, 40))
+renderimg = ImageTk.PhotoImage(img_back)
+button_back = Button(window, image = renderimg, font=('helvetica', 13, 'bold'),bd=0,command=back)
+button_back.image=renderimg
+
 
 #window.bind_all("<Control-s>", pathabsensi)
 window.mainloop()
