@@ -14,4 +14,6 @@ Selanjutnya, aplikasi akan mentraining data gambar dan label menggunakan algorit
 \
 Terakhir, pada pengenalan wajah aplikasi akan mengambil Haar Cascade Classifier untuk mendeteksi wajah, dan hasil data training untuk pengenalan wajah. Aplikasi akan mendeteksi wajah yang terdeteksi pada kamera lalu mengubahnya kedalam bentuk histogram dan membandingkannya dengan histogram dari data vektor hasil training sebelumnya. Jika ditemukan kecocokan, aplikasi akan mengambil label dari data yang cocok dan mendisplaynya di layar kamera lalu disimpan kedalam database yang berformat .csv
 # instalasi dan penggunaan
-Download file repository lalu extract. Buka command prompt lalu set ke direktori file (command cd) dan ketik python absensi_facial_recognition.py 
+Download file repository lalu extract\
+Buka command prompt lalu set ke direktori file (command cd)\
+Ketik python absensi_facial_recognition.py 
