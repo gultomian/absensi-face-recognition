@@ -862,7 +862,7 @@ def kenaliwajah(kelas, penyimpanan):
                     nomormhs='Tidak Dikenal'                
                     tt=str(nomormhs)  
 
-                if(conf > 75):
+                if(conf > 65):
                     try:
                         nomorFile=len(os.listdir("Takdikenal"))+1
                         cv2.imwrite("Takdikenal/Gambar"+str(nomorFile) + ".jpg", im[y:y+h,x:x+w]) 
